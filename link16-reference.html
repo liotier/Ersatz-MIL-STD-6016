@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ersatz MIL-STD-6016 — Open-Source Link 16 / TADIL-J Reference</title>
+<style>
+:root {
+  --bg: #1a1a2e; --bg2: #16213e; --bg3: #0f3460;
+  --fg: #e0e0e0; --fg2: #a0a0a0; --fg3: #707070;
+  --accent: #00d4ff; --accent2: #7b68ee;
+  --high: #00c853; --medium: #ffd600; --low: #ff9100; --stub: #78909c;
+  --border: #2a2a4a; --table-stripe: #1e1e3a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+  background: var(--bg); color: var(--fg); line-height: 1.6;
+  max-width: 1200px; margin: 0 auto; padding: 1rem;
+}
+h1 { color: var(--accent); font-size: 1.8rem; margin: 1rem 0 0.5rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; }
+h2 { color: var(--accent2); font-size: 1.4rem; margin: 1.5rem 0 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+h3 { color: var(--accent); font-size: 1.1rem; margin: 1rem 0 0.3rem; }
+h4 { color: var(--fg); font-size: 1rem; margin: 0.8rem 0 0.3rem; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+p, li { margin: 0.3rem 0; }
+ul, ol { padding-left: 1.5rem; }
+code { background: var(--bg2); padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.9em; }
+pre { background: var(--bg2); padding: 0.8rem; border-radius: 5px; overflow-x: auto; margin: 0.5rem 0; border: 1px solid var(--border); }
+.warning-box {
+  background: #4a1a1a; border: 2px solid #ff4444; border-radius: 8px;
+  padding: 1rem; margin: 1rem 0; color: #ffcccc;
+}
+.warning-box strong { color: #ff6666; }
+.info-box {
+  background: var(--bg2); border: 1px solid var(--accent); border-radius: 8px;
+  padding: 0.8rem; margin: 0.8rem 0;
+}
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.8rem; margin: 0.8rem 0;
+}
+.stat-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 0.8rem; text-align: center;
+}
+.stat-card .number { font-size: 2rem; color: var(--accent); font-weight: bold; }
+.stat-card .label { color: var(--fg2); font-size: 0.85rem; }
+table {
+  width: 100%; border-collapse: collapse; margin: 0.5rem 0;
+  font-size: 0.85rem;
+}
+th, td {
+  border: 1px solid var(--border); padding: 0.4rem 0.6rem; text-align: left;
+}
+th { background: var(--bg3); color: var(--accent); font-weight: 600; position: sticky; top: 0; }
+tr:nth-child(even) { background: var(--table-stripe); }
+tr:hover { background: #2a2a5a; }
+.conf {
+  display: inline-block; padding: 0.1rem 0.4rem; border-radius: 3px;
+  font-size: 0.75rem; font-weight: bold; text-transform: uppercase;
+}
+.conf-high { background: var(--high); color: #000; }
+.conf-medium { background: var(--medium); color: #000; }
+.conf-low { background: var(--low); color: #000; }
+.conf-stub { background: var(--stub); color: #fff; }
+details {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 5px;
+  margin: 0.4rem 0; overflow: hidden;
+}
+details > summary {
+  padding: 0.5rem 0.8rem; cursor: pointer; font-weight: 600;
+  background: var(--bg3); user-select: none; list-style: none;
+}
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "▸ "; color: var(--accent); }
+details[open] > summary::before { content: "▾ "; }
+details > summary:hover { background: #1a3a6a; }
+details > .content { padding: 0.8rem; }
+.msg-header {
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.3rem;
+}
+.msg-id { color: var(--accent); }
+.msg-name { flex: 1; margin-left: 0.5rem; }
+.npg-tags { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+.npg-tag {
+  background: var(--bg); padding: 0.1rem 0.4rem; border-radius: 3px;
+  font-size: 0.75rem; border: 1px solid var(--border);
+}
+.index-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.3rem; margin: 0.5rem 0;
+}
+.index-item {
+  display: flex; justify-content: space-between; padding: 0.2rem 0.4rem;
+  background: var(--bg2); border-radius: 3px; font-size: 0.85rem;
+}
+.index-item:hover { background: var(--bg3); }
+.search-box {
+  position: sticky; top: 0; z-index: 100; background: var(--bg);
+  padding: 0.5rem 0; border-bottom: 1px solid var(--border); margin-bottom: 1rem;
+}
+.search-box input {
+  width: 100%; padding: 0.5rem 0.8rem; font-family: inherit; font-size: 1rem;
+  background: var(--bg2); color: var(--fg); border: 1px solid var(--border);
+  border-radius: 5px; outline: none;
+}
+.search-box input:focus { border-color: var(--accent); }
+.search-box .filter-row {
+  display: flex; gap: 0.5rem; margin-top: 0.3rem; flex-wrap: wrap; font-size: 0.85rem;
+}
+.search-box .filter-row label { color: var(--fg2); cursor: pointer; }
+.search-box .filter-row input[type=checkbox] { margin-right: 0.2rem; }
+.param-table td:first-child { white-space: nowrap; color: var(--accent); font-weight: 600; }
+.param-table td:nth-child(2) { color: var(--fg); }
+.toc { columns: 2; column-gap: 2rem; }
+.toc li { break-inside: avoid; margin: 0.2rem 0; }
+@media (max-width: 768px) {
+  body { padding: 0.5rem; font-size: 0.9rem; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .index-grid { grid-template-columns: 1fr; }
+  .toc { columns: 1; }
+  table { font-size: 0.8rem; }
+}
+.hidden { display: none !important; }
+.bit-diagram {
+  display: flex; margin: 0.5rem 0; font-size: 0.75rem; overflow-x: auto;
+}
+.bit-field {
+  border: 1px solid var(--accent); padding: 0.3rem; text-align: center;
+  background: var(--bg2); min-width: 2rem; flex-shrink: 0;
+}
+.bit-field .bf-name { font-weight: bold; color: var(--accent); white-space: nowrap; }
+.bit-field .bf-bits { color: var(--fg3); font-size: 0.65rem; }
+.nav-links { display: flex; gap: 1rem; flex-wrap: wrap; margin: 0.5rem 0; }
+</style>
+</head>
+<body>
+
+<h1>Ersatz MIL-STD-6016</h1>
+<p style="color:var(--fg2);font-size:0.95rem;">Open-Source Link 16 / TADIL-J Message Schema Reference</p>
+<p style="color:var(--fg3);font-size:0.8rem;">Generated 2026-03-10 from public sources • Schema v1.0.0</p>
+
+<div class="warning-box">
+<strong>⚠ DISCLAIMER</strong><br>
+This document is reconstructed entirely from <strong>publicly available</strong> unclassified sources.
+It is <strong>NOT</strong> a substitute for MIL-STD-6016, STANAG 5516, or any controlled standard.
+Field-level detail (DFI/DUI definitions) is not available in open sources.
+All information carries confidence annotations: <span class="conf conf-high">HIGH</span> = directly from open standards,
+<span class="conf conf-medium">MEDIUM</span> = cross-referenced from multiple sources,
+<span class="conf conf-low">LOW</span> = single source or inferred,
+<span class="conf conf-stub">STUB</span> = name only, no field data available.
+</div>
+
+<div class="search-box">
+<input type="text" id="search" placeholder="Search messages, fields, NPGs... (e.g. 'J3.2', 'Air Track', 'surveillance')" autocomplete="off">
+<div class="filter-row">
+  <label><input type="checkbox" id="filter-high" checked> HIGH</label>
+  <label><input type="checkbox" id="filter-medium" checked> MEDIUM</label>
+  <label><input type="checkbox" id="filter-low" checked> LOW</label>
+  <label><input type="checkbox" id="filter-stub" checked> STUB</label>
+  <label style="margin-left:1rem;"><input type="checkbox" id="filter-fields-only"> Fields only</label>
+</div>
+</div>
+
+<h2 id="toc">Table of Contents</h2>
+<ol class="toc">
+<li><a href="#coverage">Coverage Index</a></li>
+<li><a href="#physical">Physical Layer</a></li>
+<li><a href="#tdma">TDMA Structure</a></li>
+<li><a href="#link">Link Layer Framing</a></li>
+<li><a href="#simhdr">Simulation Network Header</a></li>
+<li><a href="#npgs">Network Participation Groups</a></li>
+<li><a href="#messages">J-Series Message Schema</a></li>
+<li><a href="#terminals">Terminal Types</a></li>
+<li><a href="#gaps">Gaps &amp; Limitations</a></li>
+<li><a href="#sources">Sources &amp; References</a></li>
+</ol>
+
+<h2 id="coverage">Coverage Index</h2>
+<div class="stats-grid">
+<div class="stat-card"><div class="number">69</div><div class="label">Known Message Types<br>(of 256 possible)</div></div>
+<div class="stat-card"><div class="number">3</div><div class="label">HIGH confidence</div></div>
+<div class="stat-card"><div class="number">5</div><div class="label">MEDIUM confidence</div></div>
+<div class="stat-card"><div class="number">61</div><div class="label">STUB (name only)</div></div>
+</div>
+
+<h3>Message Index</h3>
+<div class="index-grid">
+
+<a href="#J0.0" class="index-item"><span><code>J0.0</code> Initial Entry</span><span class="conf conf-medium">MEDIUM</span></a>
+<a href="#J0.1" class="index-item"><span><code>J0.1</code> Test</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J0.2" class="index-item"><span><code>J0.2</code> Network Time Update</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J0.3" class="index-item"><span><code>J0.3</code> Time Slot Assignment</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J0.4" class="index-item"><span><code>J0.4</code> Radio Relay Control</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J0.5" class="index-item"><span><code>J0.5</code> Repromulgation Relay</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J0.6" class="index-item"><span><code>J0.6</code> Communication Control</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J0.7" class="index-item"><span><code>J0.7</code> Time Slot Reallocation</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J1.0" class="index-item"><span><code>J1.0</code> Connectivity Interrogation</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J1.1" class="index-item"><span><code>J1.1</code> Connectivity Status</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J1.2" class="index-item"><span><code>J1.2</code> Route Establishment</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J1.3" class="index-item"><span><code>J1.3</code> Acknowledgment</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J1.4" class="index-item"><span><code>J1.4</code> Communication Status</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J1.5" class="index-item"><span><code>J1.5</code> Net Control Initialization</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J1.6" class="index-item"><span><code>J1.6</code> Needline Participation Group Assignment</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J2.0" class="index-item"><span><code>J2.0</code> Indirect Interface Unit PPLI</span><span class="conf conf-medium">MEDIUM</span></a>
+<a href="#J2.2" class="index-item"><span><code>J2.2</code> Air PPLI</span><span class="conf conf-medium">MEDIUM</span></a>
+<a href="#J2.3" class="index-item"><span><code>J2.3</code> Surface PPLI</span><span class="conf conf-medium">MEDIUM</span></a>
+<a href="#J2.4" class="index-item"><span><code>J2.4</code> Subsurface PPLI</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J2.5" class="index-item"><span><code>J2.5</code> Land Point PPLI</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J2.6" class="index-item"><span><code>J2.6</code> Land Track PPLI</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J3.0" class="index-item"><span><code>J3.0</code> Reference Point</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J3.1" class="index-item"><span><code>J3.1</code> Emergency Point</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J3.2" class="index-item"><span><code>J3.2</code> Air Track</span><span class="conf conf-medium">MEDIUM</span></a>
+<a href="#J3.3" class="index-item"><span><code>J3.3</code> Surface Track</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J3.4" class="index-item"><span><code>J3.4</code> Subsurface Track</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J3.5" class="index-item"><span><code>J3.5</code> Land Point or Track</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J3.6" class="index-item"><span><code>J3.6</code> Space Track</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J3.7" class="index-item"><span><code>J3.7</code> Electronic Warfare Product Information</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J5.4" class="index-item"><span><code>J5.4</code> Acoustic Bearing and Range</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J6.0" class="index-item"><span><code>J6.0</code> Amplification</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J7.0" class="index-item"><span><code>J7.0</code> Track Management</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J7.1" class="index-item"><span><code>J7.1</code> Data Update Request</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J7.2" class="index-item"><span><code>J7.2</code> Correlation</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J7.3" class="index-item"><span><code>J7.3</code> Pointer</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J7.4" class="index-item"><span><code>J7.4</code> Track Identifier</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J7.5" class="index-item"><span><code>J7.5</code> IFF/SIF Management</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J7.6" class="index-item"><span><code>J7.6</code> Filter Management</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J7.7" class="index-item"><span><code>J7.7</code> Association</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J8.0" class="index-item"><span><code>J8.0</code> Unit Designator</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J8.1" class="index-item"><span><code>J8.1</code> Mission Correlator Change</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J9.0" class="index-item"><span><code>J9.0</code> Command</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J10.2" class="index-item"><span><code>J10.2</code> Engagement Status</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J10.3" class="index-item"><span><code>J10.3</code> Handover</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J10.5" class="index-item"><span><code>J10.5</code> Controlling Unit Report</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J10.6" class="index-item"><span><code>J10.6</code> Pairing</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J11.0" class="index-item"><span><code>J11.0</code> From the Weapon</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J11.1" class="index-item"><span><code>J11.1</code> To the Weapon</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J11.2" class="index-item"><span><code>J11.2</code> Weapon Coordination</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J12.0" class="index-item"><span><code>J12.0</code> Mission Assignment</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J12.1" class="index-item"><span><code>J12.1</code> Vector</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J12.2" class="index-item"><span><code>J12.2</code> Precision Aircraft Direction</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J12.3" class="index-item"><span><code>J12.3</code> Flight Path</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J12.4" class="index-item"><span><code>J12.4</code> Controlling Unit Change</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J12.5" class="index-item"><span><code>J12.5</code> Target/Track Correlation</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J12.6" class="index-item"><span><code>J12.6</code> Target Sorting</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J12.7" class="index-item"><span><code>J12.7</code> Target Bearing</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J13.0" class="index-item"><span><code>J13.0</code> Airfield Status</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J13.2" class="index-item"><span><code>J13.2</code> Air Platform and System Status</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J13.3" class="index-item"><span><code>J13.3</code> Surface Platform and System Status</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J13.4" class="index-item"><span><code>J13.4</code> Subsurface Platform and System Status</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J13.5" class="index-item"><span><code>J13.5</code> Land Platform and System Status</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J14.0" class="index-item"><span><code>J14.0</code> Parametric Information</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J14.2" class="index-item"><span><code>J14.2</code> Electronic Warfare Control / Coordination</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J15.0" class="index-item"><span><code>J15.0</code> Threat Warning</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J16.0" class="index-item"><span><code>J16.0</code> Imagery</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J17.0" class="index-item"><span><code>J17.0</code> Weather Over Target</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J28.0" class="index-item"><span><code>J28.0</code> U.S. National 1 (Army)</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J28.1" class="index-item"><span><code>J28.1</code> U.S. National 2 (Navy)</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J28.2" class="index-item"><span><code>J28.2</code> U.S. National 3 (Air Force)</span><span class="conf conf-medium">MEDIUM</span></a>
+<a href="#J28.3" class="index-item"><span><code>J28.3</code> U.S. National 4 (Marine Corps)</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J28.4" class="index-item"><span><code>J28.4</code> French National 1</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J28.5" class="index-item"><span><code>J28.5</code> French National 2</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J28.6" class="index-item"><span><code>J28.6</code> U.S. National 5 (NSA)</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J28.7" class="index-item"><span><code>J28.7</code> UK National</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J31.0" class="index-item"><span><code>J31.0</code> Over-the-Air Rekeying Management</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J31.1" class="index-item"><span><code>J31.1</code> Over-the-Air Rekeying</span><span class="conf conf-stub">STUB</span></a>
+<a href="#J31.7" class="index-item"><span><code>J31.7</code> No Statement</span><span class="conf conf-high">HIGH</span></a>
+</div>
+<h3>Label Coverage</h3>
+<table><tr><th>Coverage</th><th>Labels</th></tr>
+<tr><td>Well Covered</td><td>J0, J1, J2, J3, J31</td></tr>
+<tr><td>Partially Covered</td><td>J5, J6, J7, J8, J9, J10, J11, J12, J13, J14, J15, J16, J17, J28</td></tr>
+<tr><td>No Coverage</td><td>J4, J18, J19, J20, J21, J22, J23, J24, J25, J26, J27, J29, J30</td></tr>
+</table>
+<h2 id="physical">Physical Layer</h2>
+<p>Link 16 operates in the L-band (969–1206 MHz) using 51 center frequencies spaced 3 MHz apart.</p>
+<table class="param-table">
+<tr><td>Frequency Band</td><td>960–1215 MHz (L-band)</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Operational Range</td><td>969–1206 MHz</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Center Frequencies</td><td>51 frequencies, 3 MHz spacing</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Frequency Hopping</td><td>76,923 hops/sec, 13 µs hop interval</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Modulation</td><td>CPSM (Continuous Phase Shift Modulation)</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Chip Modulation</td><td>MSK (Minimum Shift Keying)</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Symbol Encoding</td><td>CCSK (Cyclic Code Shift Keying)</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Chip Rate</td><td>5 Mbps (32 chips/symbol, 5 bits/pulse)</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Pulse Structure</td><td>6.4 µs pulse + 6.6 µs guard = 13.0 µs</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Error Correction</td><td>Reed-Solomon (16 bits encoded per 15 bits data)</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Transmit Power</td><td>200 W</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Range</td><td>300 NM (line of sight)</td><td><span class="conf conf-high">HIGH</span></td></tr>
+</table>
+
+<h3>Frequency Subbands</h3><table><tr><th>Subband</th><th>Range</th></tr>
+<tr><td>Lower subband</td><td>969–1008 MHz</td></tr>
+<tr><td>Middle subband</td><td>1053–1065 MHz</td></tr>
+<tr><td>Upper subband</td><td>1113–1206 MHz</td></tr>
+</table>
+<h3>Communication Modes</h3>
+<table><tr><th>Mode</th><th>Freq Hopping</th><th>Data Encrypted</th><th>Description</th><th>Conf</th></tr>
+<tr><td>Mode 1</td><td>Yes</td><td>Yes</td><td>Normal JTIDS mode</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Mode 2</td><td>No</td><td>Yes</td><td>Narrowband, fixed 969 MHz</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Mode 3</td><td>No</td><td>No</td><td>Not used</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Mode 4</td><td>No</td><td>No</td><td>No encryption, fixed 969 MHz</td><td><span class="conf conf-high">HIGH</span></td></tr>
+</table>
+<h3>Security</h3>
+<table class="param-table">
+<tr><td>TSEC</td><td>Transmission Security - physical layer security</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>MSEC</td><td>Message Security - link layer encryption of message data</td><td><span class="conf conf-high">HIGH</span></td></tr>
+</table>
+<h2 id="tdma">TDMA Structure</h2>
+<p>Link 16 uses Time Division Multiple Access (TDMA) to share the RF spectrum among participating units.</p>
+<table class="param-table">
+<tr><td>Time Slot Duration</td><td>7.8125 ms (1/128 second)</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Slots per Second</td><td>128</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Time Frame</td><td>12 seconds (1,536 slots)</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Epoch Duration</td><td>12.8 minutes (98,304 slots)</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Slot Sets</td><td>A, B, C (32,768 slots each)</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Epochs per Day</td><td>112.5</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Stacked Nets</td><td>7-bit net number (0–127)</td><td><span class="conf conf-high">HIGH</span></td></tr>
+</table>
+
+<h3>Time Slot ID Format</h3>
+<table class="param-table">
+<tr><td>Total Bits</td><td>32</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Time Slot Number</td><td>0-16 (17 bits, 0-98303)</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Padding</td><td>17-23</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Epoch Number</td><td>24-31 (0-112)</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>No Statement Value</td><td>0xFFFFFFFF</td><td><span class="conf conf-high">HIGH</span></td></tr>
+</table>
+
+<h2 id="link">Link Layer Framing</h2>
+
+<h3>Header Word (JTIDS Header)</h3>
+<p>Each JTIDS message begins with a 48-bit header word (35 information bits + 13 padding bits), encoded as a Reed-Solomon code word.</p>
+
+<div class="bit-diagram">
+<div class="bit-field" style="min-width:60px"><div class="bf-name">Time Slot Type</div><div class="bf-bits">?–0 (?b)</div></div>
+<div class="bit-field" style="min-width:60px"><div class="bf-name">Relay Transmission Indicator</div><div class="bf-bits">?–0 (?b)</div></div>
+<div class="bit-field" style="min-width:60px"><div class="bf-name">Source Track Number</div><div class="bf-bits">?–0 (?b)</div></div>
+<div class="bit-field" style="min-width:60px"><div class="bf-name">Secure Data Unit Serial Number</div><div class="bf-bits">?–0 (?b)</div></div>
+<div class="bit-field" style="min-width:60px"><div class="bf-name">Padding</div><div class="bf-bits">?–0 (?b)</div></div>
+</div>
+<table><tr><th>Bit Offset</th><th>Width</th><th>Field</th><th>Description</th><th>Conf</th></tr>
+<tr><td>—</td><td>—</td><td>Time Slot Type</td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>—</td><td>—</td><td>Relay Transmission Indicator</td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>—</td><td>—</td><td>Source Track Number</td><td>STN of the sender (octal)</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>—</td><td>—</td><td>Secure Data Unit Serial Number</td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>—</td><td>—</td><td>Padding</td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+</table><p style="color:var(--fg3);font-size:0.8rem;">Source: SISO-STD-002-2021 Table 9</p>
+<h3>Message Word Format</h3>
+<p>75-bit message word (70 data + 5 parity) padded to 80 bits</p>
+<table class="param-table">
+<tr><td>Total Bits (padded)</td><td>80</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Data Bits</td><td>70</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Parity Bits</td><td>5</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Padding Bits</td><td>5</td><td><span class="conf conf-high">HIGH</span></td></tr>
+</table>
+
+<h3>Word Format Types</h3>
+<h4>Word Format 0: Initial Word</h4>
+<div class="bit-diagram">
+<div class="bit-field" style="min-width:60px"><div class="bf-name">Word Format</div><div class="bf-bits">?–0 (?b)</div></div>
+<div class="bit-field" style="min-width:60px"><div class="bf-name">Label</div><div class="bf-bits">?–0 (?b)</div></div>
+<div class="bit-field" style="min-width:60px"><div class="bf-name">Sublabel</div><div class="bf-bits">?–0 (?b)</div></div>
+<div class="bit-field" style="min-width:60px"><div class="bf-name">Message Length Indicator</div><div class="bf-bits">?–0 (?b)</div></div>
+<div class="bit-field" style="min-width:60px"><div class="bf-name">Message Data</div><div class="bf-bits">?–0 (?b)</div></div>
+<div class="bit-field" style="min-width:60px"><div class="bf-name">Parity</div><div class="bf-bits">?–0 (?b)</div></div>
+</div>
+<table><tr><th>Bit Offset</th><th>Width</th><th>Field</th><th>Description</th><th>Conf</th></tr>
+<tr><td>—</td><td>—</td><td>Word Format</td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>—</td><td>—</td><td>Label</td><td>Message category (0-31)</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>—</td><td>—</td><td>Sublabel</td><td>Message subcategory (0-7)</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>—</td><td>—</td><td>Message Length Indicator</td><td>Number of words in message</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>—</td><td>—</td><td>Message Data</td><td>Message-specific payload</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>—</td><td>—</td><td>Parity</td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+</table>
+<h4>Word Format 2: Extension Word</h4>
+<div class="bit-diagram">
+<div class="bit-field" style="min-width:60px"><div class="bf-name">Word Format</div><div class="bf-bits">?–0 (?b)</div></div>
+<div class="bit-field" style="min-width:60px"><div class="bf-name">Message Data</div><div class="bf-bits">?–0 (?b)</div></div>
+<div class="bit-field" style="min-width:60px"><div class="bf-name">Parity</div><div class="bf-bits">?–0 (?b)</div></div>
+</div>
+<table><tr><th>Bit Offset</th><th>Width</th><th>Field</th><th>Description</th><th>Conf</th></tr>
+<tr><td>—</td><td>—</td><td>Word Format</td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>—</td><td>—</td><td>Message Data</td><td>Continuation of message payload</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>—</td><td>—</td><td>Parity</td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+</table>
+<h4>Word Format 1: Continuation Word</h4>
+<div class="bit-diagram">
+<div class="bit-field" style="min-width:60px"><div class="bf-name">Word Format</div><div class="bf-bits">?–0 (?b)</div></div>
+<div class="bit-field" style="min-width:60px"><div class="bf-name">Continuation Word Label</div><div class="bf-bits">?–0 (?b)</div></div>
+<div class="bit-field" style="min-width:60px"><div class="bf-name">Message Data</div><div class="bf-bits">?–0 (?b)</div></div>
+<div class="bit-field" style="min-width:60px"><div class="bf-name">Parity</div><div class="bf-bits">?–0 (?b)</div></div>
+</div>
+<table><tr><th>Bit Offset</th><th>Width</th><th>Field</th><th>Description</th><th>Conf</th></tr>
+<tr><td>—</td><td>—</td><td>Word Format</td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>—</td><td>—</td><td>Continuation Word Label</td><td>Identifies continuation word type</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>—</td><td>—</td><td>Message Data</td><td>Continuation payload</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>—</td><td>—</td><td>Parity</td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+</table>
+<h3>Packing Modes</h3>
+<table><tr><th>Mode</th><th>Words/Slot</th><th>Data bits/Slot</th><th>Data Rate</th><th>EDAC Rate</th><th>Conf</th></tr>
+<tr><td>Standard (STD)</td><td>3</td><td>210</td><td>26.88 kbps</td><td>59.52 kbps</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Packed-2 (P2)</td><td>6</td><td>420</td><td>53.76 kbps</td><td>—</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Packed-4 Single Pulse (P4-SP)</td><td>12</td><td>840</td><td>107.52 kbps</td><td>—</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Packed-4 Double Pulse (P4-DP)</td><td>12</td><td>—</td><td>—</td><td>—</td><td><span class="conf conf-medium">MEDIUM</span></td></tr>
+</table>
+<h2 id="simhdr">Simulation Network Header</h2>
+<p>SISO-STD-002 Link 16 Simulation Network Header (simulation-only construct)</p>
+<p>Total: 160 bits</p>
+<table><tr><th>Field</th><th>Bits</th><th>Type</th><th>Range</th><th>Description</th><th>Conf</th></tr>
+
+<tr><td>NPG Number</td><td>16</td><td>uint16</td><td>0-511</td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Net Number</td><td>8</td><td>uint8</td><td>0-127</td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>TSEC CVLL</td><td>8</td><td>uint8</td><td>0-127, 255=no statement</td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>MSEC CVLL</td><td>8</td><td>uint8</td><td>0-127, 255=no statement</td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Message Type Identifier</td><td>8</td><td>enum</td><td></td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>SISO-STD-002 Version</td><td>8</td><td>enum</td><td></td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Link 16 Version</td><td>8</td><td>enum</td><td>0-255</td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Time Slot ID</td><td>32</td><td>uint32</td><td></td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>Perceived Transmit Time</td><td>64</td><td>NTP timestamp</td><td></td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+</table>
+<h3>Message Type Identifiers</h3>
+<table><tr><th>Value</th><th>Name</th><th>Description</th></tr>
+<tr><td>0</td><td>JTIDS Header/Messages</td><td>Fixed Word Format J-series messages</td></tr>
+<tr><td>1</td><td>RTT A/B</td><td>Round Trip Timing Addressed/Broadcast</td></tr>
+<tr><td>2</td><td>RTT Reply</td><td>Round Trip Timing Reply</td></tr>
+<tr><td>3</td><td>JTIDS Voice CVSD</td><td>Continuous Variable Slope Delta voice</td></tr>
+<tr><td>4</td><td>JTIDS Voice LPC10</td><td>Linear Predictive Coding 10 voice</td></tr>
+<tr><td>5</td><td>JTIDS Voice LPC12</td><td>Linear Predictive Coding 12 voice</td></tr>
+<tr><td>6</td><td>JTIDS LET</td><td>Link 16 Enhanced Throughput</td></tr>
+<tr><td>7</td><td>VMF</td><td>Variable Message Format</td></tr>
+</table>
+<h2 id="npgs">Network Participation Groups (NPGs)</h2>
+<p>Link 16 uses NPGs to organize message traffic. There are 23 defined NPGs out of 512 possible (9-bit NPG number).</p>
+<table><tr><th>NPG</th><th>Name</th><th>Function</th><th>Associated Messages</th><th>Conf</th></tr>
+
+<tr><td>1</td><td>Initial Entry</td><td>Network entry and synchronization</td><td>J0.0</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>2</td><td>RTT-A</td><td>Round Trip Timing Addressed - active synchronization with specific terminal</td><td>RTT A</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>3</td><td>RTT-B</td><td>Round Trip Timing Broadcast - active synchronization broadcast</td><td>RTT B</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>4</td><td>Network Management</td><td>Network management and control messages</td><td>J0.x, J1.x</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>5</td><td>PPLI and Status</td><td>Precise Participant Location and Identification</td><td>J2.0, J2.2, J2.3, J2.4, J2.5, J2.6</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>6</td><td>PPLI and Status</td><td>Precise Participant Location and Identification (additional)</td><td>J2.0, J2.2, J2.3, J2.4, J2.5, J2.6</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>7</td><td>Surveillance</td><td>Track reporting - air, surface, subsurface, land, space, EW products</td><td>J3.0, J3.1, J3.2, J3.3, J3.4, J3.5, J3.6, J3.7, J7.0, J7.1, J7.2, J7.3, J7.4, J7.5, J7.6, J7.7</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>8</td><td>Mission Management / Weapons Coordination</td><td>Mission management, weapons coordination, and engagement</td><td>J8.0, J8.1, J9.0, J10.2, J10.3, J10.5, J10.6, J11.0, J11.1, J11.2, J12.0, J12.1, J12.2, J12.3, J12.4, J12.5, J12.6, J12.7</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>9</td><td>Control</td><td>Air control - used by C2JUs to control non-C2JUs</td><td>J12.0, J12.1, J12.2, J12.3, J12.4, J12.5, J12.6, J12.7</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>10</td><td>Electronic Warfare</td><td>Electronic Warfare parametric data and coordination</td><td>J14.0, J14.2</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>11</td><td>Image Transfer</td><td>Imagery data transfer</td><td>J16.0</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>12</td><td>Voice A</td><td>JTIDS voice channel A</td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>13</td><td>Voice B</td><td>JTIDS voice channel B</td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>14</td><td>Indirect PPLI</td><td>Indirect Precise Participant Location and Identification (US Navy usage)</td><td>J2.0</td><td><span class="conf conf-medium">MEDIUM</span></td></tr>
+<tr><td>15</td><td>US Army Reserved</td><td>Reserved for US Army joint use</td><td></td><td><span class="conf conf-medium">MEDIUM</span></td></tr>
+<tr><td>16</td><td>US Army Reserved</td><td>Reserved for US Army joint use</td><td></td><td><span class="conf conf-medium">MEDIUM</span></td></tr>
+<tr><td>18</td><td>Network Enabled Weapons</td><td>Weapons control and network-enabled weapons data</td><td>J11.0, J11.1, J11.2</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>19</td><td>Fighter-to-Fighter A</td><td>Direct fighter-to-fighter communications channel A</td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>20</td><td>Fighter-to-Fighter B</td><td>Direct fighter-to-fighter communications channel B</td><td></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>21</td><td>Engagement Coordination</td><td>Engagement coordination and deconfliction</td><td>J10.2, J10.3, J10.5, J10.6</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>25</td><td>US Army Reserved</td><td>Reserved for US Army joint use</td><td></td><td><span class="conf conf-medium">MEDIUM</span></td></tr>
+<tr><td>27</td><td>Joint Net PPLI</td><td>Joint network Precise Participant Location and Identification</td><td>J2.0, J2.2, J2.3, J2.4, J2.5, J2.6</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>28</td><td>Distributed Network Management</td><td>Distributed network management functions</td><td>J0.x, J1.x</td><td><span class="conf conf-high">HIGH</span></td></tr>
+</table>
+<h2 id="messages">J-Series Message Schema</h2>
+<p>69 known message types across 19 labels. Labels use 5 bits (0–31), sublabels use 3 bits (0–7), yielding 256 possible combinations.</p>
+
+<h3 id="label-0">Label 0: Network Management</h3>
+<details class="msg-entry" data-id="J0.0" data-name="Initial Entry" data-conf="medium" id="J0.0">
+<summary><div class="msg-header"><span><code class="msg-id">J0.0</code> <span class="msg-name">Initial Entry</span></span><span><span class="npg-tag">NPG 1</span><span class="npg-tag">NPG 4</span><span class="npg-tag">NPG 28</span><span class="conf conf-medium">MEDIUM</span></span></div></summary>
+<div class="content">
+<p>Net entry message transmitted by NTR/IEJU. Contains time slot assignments and network synchronization data. Transmitted in pairs, typically every 12 seconds in time slot A-0-6.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Network Management</td></tr>
+<tr><td>Packing Mode</td><td>Standard</td></tr>
+<tr><td>NPGs</td><td>NPG 1 (Initial Entry), NPG 4 (Network Management), NPG 28 (Distributed Network Management)</td></tr>
+<tr><td>Source</td><td>SISO-STD-002-2021, Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+<p style="color:var(--fg2);font-size:0.85rem;margin-top:0.5rem;">Note: Field-level detail requires MIL-STD-6016. Used for initial and coarse synchronization.</p>
+</div></details>
+<details class="msg-entry" data-id="J0.1" data-name="Test" data-conf="stub" id="J0.1">
+<summary><div class="msg-header"><span><code class="msg-id">J0.1</code> <span class="msg-name">Test</span></span><span><span class="npg-tag">NPG 4</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Network test message.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Network Management</td></tr>
+<tr><td>NPGs</td><td>NPG 4 (Network Management)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J0.2" data-name="Network Time Update" data-conf="stub" id="J0.2">
+<summary><div class="msg-header"><span><code class="msg-id">J0.2</code> <span class="msg-name">Network Time Update</span></span><span><span class="npg-tag">NPG 4</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Provides network time corrections and updates.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Network Management</td></tr>
+<tr><td>NPGs</td><td>NPG 4 (Network Management)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J0.3" data-name="Time Slot Assignment" data-conf="stub" id="J0.3">
+<summary><div class="msg-header"><span><code class="msg-id">J0.3</code> <span class="msg-name">Time Slot Assignment</span></span><span><span class="npg-tag">NPG 4</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Assigns time slots to JUs on the network.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Network Management</td></tr>
+<tr><td>NPGs</td><td>NPG 4 (Network Management)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J0.4" data-name="Radio Relay Control" data-conf="stub" id="J0.4">
+<summary><div class="msg-header"><span><code class="msg-id">J0.4</code> <span class="msg-name">Radio Relay Control</span></span><span><span class="npg-tag">NPG 4</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Controls radio relay operations for beyond-line-of-sight messaging.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Network Management</td></tr>
+<tr><td>NPGs</td><td>NPG 4 (Network Management)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J0.5" data-name="Repromulgation Relay" data-conf="stub" id="J0.5">
+<summary><div class="msg-header"><span><code class="msg-id">J0.5</code> <span class="msg-name">Repromulgation Relay</span></span><span><span class="npg-tag">NPG 4</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Controls repromulgation (retransmission) of messages via relay.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Network Management</td></tr>
+<tr><td>NPGs</td><td>NPG 4 (Network Management)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J0.6" data-name="Communication Control" data-conf="stub" id="J0.6">
+<summary><div class="msg-header"><span><code class="msg-id">J0.6</code> <span class="msg-name">Communication Control</span></span><span><span class="npg-tag">NPG 4</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Communication control and network management directives.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Network Management</td></tr>
+<tr><td>NPGs</td><td>NPG 4 (Network Management)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J0.7" data-name="Time Slot Reallocation" data-conf="stub" id="J0.7">
+<summary><div class="msg-header"><span><code class="msg-id">J0.7</code> <span class="msg-name">Time Slot Reallocation</span></span><span><span class="npg-tag">NPG 4</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Dynamic reallocation of time slots during network operations.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Network Management</td></tr>
+<tr><td>NPGs</td><td>NPG 4 (Network Management)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<h3 id="label-1">Label 1: Network Management</h3>
+<details class="msg-entry" data-id="J1.0" data-name="Connectivity Interrogation" data-conf="stub" id="J1.0">
+<summary><div class="msg-header"><span><code class="msg-id">J1.0</code> <span class="msg-name">Connectivity Interrogation</span></span><span><span class="npg-tag">NPG 4</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Interrogates network connectivity status.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Network Management</td></tr>
+<tr><td>NPGs</td><td>NPG 4 (Network Management)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J1.1" data-name="Connectivity Status" data-conf="stub" id="J1.1">
+<summary><div class="msg-header"><span><code class="msg-id">J1.1</code> <span class="msg-name">Connectivity Status</span></span><span><span class="npg-tag">NPG 4</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Reports network connectivity status in response to interrogation.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Network Management</td></tr>
+<tr><td>NPGs</td><td>NPG 4 (Network Management)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J1.2" data-name="Route Establishment" data-conf="stub" id="J1.2">
+<summary><div class="msg-header"><span><code class="msg-id">J1.2</code> <span class="msg-name">Route Establishment</span></span><span><span class="npg-tag">NPG 4</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Establishes communication routes through the network.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Network Management</td></tr>
+<tr><td>NPGs</td><td>NPG 4 (Network Management)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J1.3" data-name="Acknowledgment" data-conf="stub" id="J1.3">
+<summary><div class="msg-header"><span><code class="msg-id">J1.3</code> <span class="msg-name">Acknowledgment</span></span><span><span class="npg-tag">NPG 4</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Acknowledgment of received messages.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Network Management</td></tr>
+<tr><td>NPGs</td><td>NPG 4 (Network Management)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J1.4" data-name="Communication Status" data-conf="stub" id="J1.4">
+<summary><div class="msg-header"><span><code class="msg-id">J1.4</code> <span class="msg-name">Communication Status</span></span><span><span class="npg-tag">NPG 4</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Reports communication system status.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Network Management</td></tr>
+<tr><td>NPGs</td><td>NPG 4 (Network Management)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J1.5" data-name="Net Control Initialization" data-conf="stub" id="J1.5">
+<summary><div class="msg-header"><span><code class="msg-id">J1.5</code> <span class="msg-name">Net Control Initialization</span></span><span><span class="npg-tag">NPG 4</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Initializes net control parameters.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Network Management</td></tr>
+<tr><td>NPGs</td><td>NPG 4 (Network Management)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J1.6" data-name="Needline Participation Group Assignment" data-conf="stub" id="J1.6">
+<summary><div class="msg-header"><span><code class="msg-id">J1.6</code> <span class="msg-name">Needline Participation Group Assignment</span></span><span><span class="npg-tag">NPG 4</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Assigns participation groups based on needline requirements.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Network Management</td></tr>
+<tr><td>NPGs</td><td>NPG 4 (Network Management)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<h3 id="label-2">Label 2: Precise Participant Location and Identification</h3>
+<details class="msg-entry" data-id="J2.0" data-name="Indirect Interface Unit PPLI" data-conf="medium" id="J2.0">
+<summary><div class="msg-header"><span><code class="msg-id">J2.0</code> <span class="msg-name">Indirect Interface Unit PPLI</span></span><span><span class="npg-tag">NPG 5</span><span class="npg-tag">NPG 6</span><span class="npg-tag">NPG 14</span><span class="npg-tag">NPG 27</span><span class="conf conf-medium">MEDIUM</span></span></div></summary>
+<div class="content">
+<p>PPLI for units connected via indirect interface (e.g., forwarded via gateway).</p>
+<table class="param-table">
+<tr><td>Category</td><td>Precise Participant Location and Identification</td></tr>
+<tr><td>Packing Mode</td><td>Standard</td></tr>
+<tr><td>NPGs</td><td>NPG 5 (PPLI and Status), NPG 6 (PPLI and Status), NPG 14 (Indirect PPLI), NPG 27 (Joint Net PPLI)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J2.2" data-name="Air PPLI" data-conf="medium" id="J2.2">
+<summary><div class="msg-header"><span><code class="msg-id">J2.2</code> <span class="msg-name">Air PPLI</span></span><span><span class="npg-tag">NPG 5</span><span class="npg-tag">NPG 6</span><span class="npg-tag">NPG 27</span><span class="conf conf-medium">MEDIUM</span></span></div></summary>
+<div class="content">
+<p>Precise Participant Location and Identification for air platforms. Contains voice callsign, geodetic position (lat/lon), altitude, course, IFF codes, air platform type, and network participation status. Transmitted nominally every 12 seconds.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Precise Participant Location and Identification</td></tr>
+<tr><td>Word Count</td><td>3</td></tr>
+<tr><td>Packing Mode</td><td>Standard</td></tr>
+<tr><td>NPGs</td><td>NPG 5 (PPLI and Status), NPG 6 (PPLI and Status), NPG 27 (Joint Net PPLI)</td></tr>
+<tr><td>Source</td><td>DSTO-TN-1257, SISO-STD-002-2021 Annex B, Viasat card, ADA404334</td></tr>
+</table>
+<h4>Fields</h4>
+<table><tr><th>Bit Offset</th><th>Bit Width</th><th>Field Name</th><th>Type</th><th>Values</th><th>Description</th><th>Source</th><th>Conf</th></tr>
+<tr><td>0</td><td>2</td><td>Word Format</td><td><code>enum</code></td><td>0=Initial</td><td>Initial word indicator</td><td style="font-size:0.75rem">DSTO-TN-1257</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>2</td><td>5</td><td>Label</td><td><code>uint</code></td><td>2=PPLI</td><td>Message label = 2</td><td style="font-size:0.75rem">DSTO-TN-1257</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>7</td><td>3</td><td>Sublabel</td><td><code>uint</code></td><td>2=Air</td><td>Sublabel = 2 (Air)</td><td style="font-size:0.75rem">DSTO-TN-1257</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>10</td><td>3</td><td>Message Length Indicator</td><td><code>uint</code></td><td></td><td>Number of words (typically 2 for 3-word message)</td><td style="font-size:0.75rem">DSTO-TN-1257</td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>—</td><td>15</td><td>Track Number</td><td><code>octal</code></td><td></td><td>Source Track Number (5-digit octal)</td><td style="font-size:0.75rem">ADA404334, web sources</td><td><span class="conf conf-medium">MEDIUM</span></td></tr>
+<tr><td>—</td><td>23</td><td>Latitude</td><td><code>signed_fixed</code></td><td></td><td>Geodetic latitude, WGS-84. Resolution ~0.0039° (~434m)</td><td style="font-size:0.75rem">Web search inference</td><td><span class="conf conf-low">LOW</span></td></tr>
+<tr><td>—</td><td>24</td><td>Longitude</td><td><code>signed_fixed</code></td><td></td><td>Geodetic longitude, WGS-84. Resolution ~0.0039°</td><td style="font-size:0.75rem">Web search inference</td><td><span class="conf conf-low">LOW</span></td></tr>
+<tr><td>—</td><td>—</td><td>Altitude</td><td><code>signed_fixed</code></td><td></td><td>Altitude above mean sea level</td><td style="font-size:0.75rem">Inferred</td><td><span class="conf conf-low">LOW</span></td></tr>
+<tr><td>—</td><td>—</td><td>Course</td><td><code>uint</code></td><td></td><td>Course/heading of platform</td><td style="font-size:0.75rem">ADA404334</td><td><span class="conf conf-low">LOW</span></td></tr>
+<tr><td>—</td><td>—</td><td>Speed</td><td><code>uint</code></td><td></td><td>Platform speed</td><td style="font-size:0.75rem">ADA404334</td><td><span class="conf conf-low">LOW</span></td></tr>
+<tr><td>—</td><td>—</td><td>Platform Type</td><td><code>enum</code></td><td></td><td>Air platform type designation</td><td style="font-size:0.75rem">ADA404334</td><td><span class="conf conf-low">LOW</span></td></tr>
+<tr><td>—</td><td>—</td><td>IFF/SIF Codes</td><td><code>bitfield</code></td><td></td><td>IFF/SIF transponder codes</td><td style="font-size:0.75rem">ADA404334</td><td><span class="conf conf-low">LOW</span></td></tr>
+<tr><td>—</td><td>—</td><td>Voice Callsign</td><td><code>alphanumeric</code></td><td></td><td>Voice callsign of platform</td><td style="font-size:0.75rem">ADA404334</td><td><span class="conf conf-low">LOW</span></td></tr>
+</table>
+<p style="color:var(--fg2);font-size:0.85rem;margin-top:0.5rem;">Note: This is the most commonly observed message type. The 3-word structure (Initial + Extension + Continuation) is confirmed by the SISO-STD-002 Annex B example. Exact bit offsets for payload fields require MIL-STD-6016.</p>
+</div></details>
+<details class="msg-entry" data-id="J2.3" data-name="Surface PPLI" data-conf="medium" id="J2.3">
+<summary><div class="msg-header"><span><code class="msg-id">J2.3</code> <span class="msg-name">Surface PPLI</span></span><span><span class="npg-tag">NPG 5</span><span class="npg-tag">NPG 6</span><span class="npg-tag">NPG 27</span><span class="conf conf-medium">MEDIUM</span></span></div></summary>
+<div class="content">
+<p>PPLI for surface (maritime) platforms. Contains position, course, speed, and identification data.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Precise Participant Location and Identification</td></tr>
+<tr><td>Word Count</td><td>3</td></tr>
+<tr><td>Packing Mode</td><td>Standard</td></tr>
+<tr><td>NPGs</td><td>NPG 5 (PPLI and Status), NPG 6 (PPLI and Status), NPG 27 (Joint Net PPLI)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card), ADA404334</td></tr>
+</table>
+<h4>Fields</h4>
+<table><tr><th>Bit Offset</th><th>Bit Width</th><th>Field Name</th><th>Type</th><th>Values</th><th>Description</th><th>Source</th><th>Conf</th></tr>
+<tr><td>0</td><td>2</td><td>Word Format</td><td><code>enum</code></td><td></td><td>Initial word indicator</td><td style="font-size:0.75rem"></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>2</td><td>5</td><td>Label</td><td><code>uint</code></td><td></td><td>Label = 2</td><td style="font-size:0.75rem"></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>7</td><td>3</td><td>Sublabel</td><td><code>uint</code></td><td></td><td>Sublabel = 3 (Surface)</td><td style="font-size:0.75rem"></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>10</td><td>3</td><td>Message Length Indicator</td><td><code>uint</code></td><td></td><td></td><td style="font-size:0.75rem"></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>—</td><td>—</td><td>Latitude</td><td><code>signed_fixed</code></td><td></td><td></td><td style="font-size:0.75rem"></td><td><span class="conf conf-low">LOW</span></td></tr>
+<tr><td>—</td><td>—</td><td>Longitude</td><td><code>signed_fixed</code></td><td></td><td></td><td style="font-size:0.75rem"></td><td><span class="conf conf-low">LOW</span></td></tr>
+<tr><td>—</td><td>—</td><td>Course</td><td><code>uint</code></td><td></td><td></td><td style="font-size:0.75rem"></td><td><span class="conf conf-low">LOW</span></td></tr>
+<tr><td>—</td><td>—</td><td>Speed</td><td><code>uint</code></td><td></td><td></td><td style="font-size:0.75rem"></td><td><span class="conf conf-low">LOW</span></td></tr>
+</table>
+</div></details>
+<details class="msg-entry" data-id="J2.4" data-name="Subsurface PPLI" data-conf="stub" id="J2.4">
+<summary><div class="msg-header"><span><code class="msg-id">J2.4</code> <span class="msg-name">Subsurface PPLI</span></span><span><span class="npg-tag">NPG 5</span><span class="npg-tag">NPG 6</span><span class="npg-tag">NPG 27</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>PPLI for subsurface (submarine) platforms.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Precise Participant Location and Identification</td></tr>
+<tr><td>Packing Mode</td><td>Standard</td></tr>
+<tr><td>NPGs</td><td>NPG 5 (PPLI and Status), NPG 6 (PPLI and Status), NPG 27 (Joint Net PPLI)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J2.5" data-name="Land Point PPLI" data-conf="stub" id="J2.5">
+<summary><div class="msg-header"><span><code class="msg-id">J2.5</code> <span class="msg-name">Land Point PPLI</span></span><span><span class="npg-tag">NPG 5</span><span class="npg-tag">NPG 6</span><span class="npg-tag">NPG 27</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>PPLI for fixed land-based platforms (e.g., command posts, radar sites).</p>
+<table class="param-table">
+<tr><td>Category</td><td>Precise Participant Location and Identification</td></tr>
+<tr><td>Packing Mode</td><td>Standard</td></tr>
+<tr><td>NPGs</td><td>NPG 5 (PPLI and Status), NPG 6 (PPLI and Status), NPG 27 (Joint Net PPLI)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J2.6" data-name="Land Track PPLI" data-conf="stub" id="J2.6">
+<summary><div class="msg-header"><span><code class="msg-id">J2.6</code> <span class="msg-name">Land Track PPLI</span></span><span><span class="npg-tag">NPG 5</span><span class="npg-tag">NPG 6</span><span class="npg-tag">NPG 27</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>PPLI for mobile land-based platforms (e.g., ground vehicles).</p>
+<table class="param-table">
+<tr><td>Category</td><td>Precise Participant Location and Identification</td></tr>
+<tr><td>Packing Mode</td><td>Standard</td></tr>
+<tr><td>NPGs</td><td>NPG 5 (PPLI and Status), NPG 6 (PPLI and Status), NPG 27 (Joint Net PPLI)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<h3 id="label-3">Label 3: Surveillance</h3>
+<details class="msg-entry" data-id="J3.0" data-name="Reference Point" data-conf="stub" id="J3.0">
+<summary><div class="msg-header"><span><code class="msg-id">J3.0</code> <span class="msg-name">Reference Point</span></span><span><span class="npg-tag">NPG 7</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Reports a reference point (e.g., datum, waypoint, or fixed geographic reference).</p>
+<table class="param-table">
+<tr><td>Category</td><td>Surveillance</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J3.1" data-name="Emergency Point" data-conf="stub" id="J3.1">
+<summary><div class="msg-header"><span><code class="msg-id">J3.1</code> <span class="msg-name">Emergency Point</span></span><span><span class="npg-tag">NPG 7</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Reports an emergency point (e.g., downed aircraft, distress signal).</p>
+<table class="param-table">
+<tr><td>Category</td><td>Surveillance</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J3.2" data-name="Air Track" data-conf="medium" id="J3.2">
+<summary><div class="msg-header"><span><code class="msg-id">J3.2</code> <span class="msg-name">Air Track</span></span><span><span class="npg-tag">NPG 7</span><span class="conf conf-medium">MEDIUM</span></span></div></summary>
+<div class="content">
+<p>Reports an air surveillance track. Contains track number, position (lat/lon/altitude), speed, course, identity (pending/unknown/friend/neutral/suspect/hostile), platform type, specific type, nationality, strength, and track quality.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Surveillance</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card), ADA404334, ADS-B gateway doc, Falcon BMS</td></tr>
+</table>
+<h4>Fields</h4>
+<table><tr><th>Bit Offset</th><th>Bit Width</th><th>Field Name</th><th>Type</th><th>Values</th><th>Description</th><th>Source</th><th>Conf</th></tr>
+<tr><td>0</td><td>2</td><td>Word Format</td><td><code>enum</code></td><td></td><td></td><td style="font-size:0.75rem"></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>2</td><td>5</td><td>Label</td><td><code>uint</code></td><td></td><td>Label = 3</td><td style="font-size:0.75rem"></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>7</td><td>3</td><td>Sublabel</td><td><code>uint</code></td><td></td><td>Sublabel = 2 (Air Track)</td><td style="font-size:0.75rem"></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>—</td><td>15</td><td>Track Number</td><td><code>octal</code></td><td></td><td>Track number (5-digit octal)</td><td style="font-size:0.75rem"></td><td><span class="conf conf-medium">MEDIUM</span></td></tr>
+<tr><td>—</td><td>—</td><td>Identity</td><td><code>enum</code></td><td>Pending, Unknown, Assumed Friend, Friend, Neutral, Suspect, Hostile (INCOMPLETE)</td><td>Track identity/IFF status (enumeration INCOMPLETE)</td><td style="font-size:0.75rem">ADA404334, Falcon BMS Forum</td><td><span class="conf conf-medium">MEDIUM</span></td></tr>
+<tr><td>—</td><td>—</td><td>Latitude</td><td><code>signed_fixed</code></td><td></td><td>Track latitude</td><td style="font-size:0.75rem"></td><td><span class="conf conf-low">LOW</span></td></tr>
+<tr><td>—</td><td>—</td><td>Longitude</td><td><code>signed_fixed</code></td><td></td><td>Track longitude</td><td style="font-size:0.75rem"></td><td><span class="conf conf-low">LOW</span></td></tr>
+<tr><td>—</td><td>—</td><td>Altitude</td><td><code>signed_fixed</code></td><td></td><td>Track altitude</td><td style="font-size:0.75rem"></td><td><span class="conf conf-low">LOW</span></td></tr>
+<tr><td>—</td><td>—</td><td>Speed</td><td><code>uint</code></td><td></td><td>Track speed</td><td style="font-size:0.75rem"></td><td><span class="conf conf-low">LOW</span></td></tr>
+<tr><td>—</td><td>—</td><td>Course</td><td><code>uint</code></td><td></td><td>Track course/heading</td><td style="font-size:0.75rem"></td><td><span class="conf conf-low">LOW</span></td></tr>
+<tr><td>—</td><td>—</td><td>Strength</td><td><code>uint</code></td><td></td><td>Formation strength (defaults to 1 if unspecified)</td><td style="font-size:0.75rem"></td><td><span class="conf conf-low">LOW</span></td></tr>
+<tr><td>—</td><td>—</td><td>Platform Type</td><td><code>enum</code></td><td></td><td>Air platform type (fighter, bomber, etc.)</td><td style="font-size:0.75rem"></td><td><span class="conf conf-low">LOW</span></td></tr>
+<tr><td>—</td><td>—</td><td>Specific Type</td><td><code>enum</code></td><td></td><td>Specific platform designation (F-15, MiG-29, etc.)</td><td style="font-size:0.75rem"></td><td><span class="conf conf-low">LOW</span></td></tr>
+</table>
+<p style="color:var(--fg2);font-size:0.85rem;margin-top:0.5rem;">Note: Most commonly used surveillance message. Similar fields to ADS-B. Exact bit positions require MIL-STD-6016.</p>
+</div></details>
+<details class="msg-entry" data-id="J3.3" data-name="Surface Track" data-conf="stub" id="J3.3">
+<summary><div class="msg-header"><span><code class="msg-id">J3.3</code> <span class="msg-name">Surface Track</span></span><span><span class="npg-tag">NPG 7</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Reports a surface (maritime) surveillance track. Contains position, course, speed, identity, and vessel type.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Surveillance</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J3.4" data-name="Subsurface Track" data-conf="stub" id="J3.4">
+<summary><div class="msg-header"><span><code class="msg-id">J3.4</code> <span class="msg-name">Subsurface Track</span></span><span><span class="npg-tag">NPG 7</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Reports a subsurface (submarine) surveillance track.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Surveillance</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J3.5" data-name="Land Point or Track" data-conf="stub" id="J3.5">
+<summary><div class="msg-header"><span><code class="msg-id">J3.5</code> <span class="msg-name">Land Point or Track</span></span><span><span class="npg-tag">NPG 7</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Reports a land point or land mobile track.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Surveillance</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J3.6" data-name="Space Track" data-conf="stub" id="J3.6">
+<summary><div class="msg-header"><span><code class="msg-id">J3.6</code> <span class="msg-name">Space Track</span></span><span><span class="npg-tag">NPG 7</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Reports a space surveillance track (satellite, missile, etc.).</p>
+<table class="param-table">
+<tr><td>Category</td><td>Surveillance</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J3.7" data-name="Electronic Warfare Product Information" data-conf="stub" id="J3.7">
+<summary><div class="msg-header"><span><code class="msg-id">J3.7</code> <span class="msg-name">Electronic Warfare Product Information</span></span><span><span class="npg-tag">NPG 7</span><span class="npg-tag">NPG 10</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Reports electronic warfare product information associated with surveillance tracks.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Surveillance</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance), NPG 10 (Electronic Warfare)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<h3 id="label-5">Label 5: Anti-Submarine Warfare</h3>
+<details class="msg-entry" data-id="J5.4" data-name="Acoustic Bearing and Range" data-conf="stub" id="J5.4">
+<summary><div class="msg-header"><span><code class="msg-id">J5.4</code> <span class="msg-name">Acoustic Bearing and Range</span></span><span><span class="npg-tag">NPG 7</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Reports acoustic bearing and range data for ASW operations.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Anti-Submarine Warfare</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<h3 id="label-6">Label 6: Intelligence</h3>
+<details class="msg-entry" data-id="J6.0" data-name="Amplification" data-conf="stub" id="J6.0">
+<summary><div class="msg-header"><span><code class="msg-id">J6.0</code> <span class="msg-name">Amplification</span></span><span><span class="npg-tag">NPG 7</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Provides amplifying intelligence information for tracks or events.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Intelligence</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<h3 id="label-7">Label 7: Information Management</h3>
+<details class="msg-entry" data-id="J7.0" data-name="Track Management" data-conf="stub" id="J7.0">
+<summary><div class="msg-header"><span><code class="msg-id">J7.0</code> <span class="msg-name">Track Management</span></span><span><span class="npg-tag">NPG 7</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Manages track data including track drops, updates, and transfers.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Information Management</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J7.1" data-name="Data Update Request" data-conf="stub" id="J7.1">
+<summary><div class="msg-header"><span><code class="msg-id">J7.1</code> <span class="msg-name">Data Update Request</span></span><span><span class="npg-tag">NPG 7</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Requests updated data for specified tracks.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Information Management</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J7.2" data-name="Correlation" data-conf="stub" id="J7.2">
+<summary><div class="msg-header"><span><code class="msg-id">J7.2</code> <span class="msg-name">Correlation</span></span><span><span class="npg-tag">NPG 7</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Correlates tracks from multiple sources to establish unified track picture.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Information Management</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J7.3" data-name="Pointer" data-conf="stub" id="J7.3">
+<summary><div class="msg-header"><span><code class="msg-id">J7.3</code> <span class="msg-name">Pointer</span></span><span><span class="npg-tag">NPG 7</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Points to related tracks or data.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Information Management</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J7.4" data-name="Track Identifier" data-conf="stub" id="J7.4">
+<summary><div class="msg-header"><span><code class="msg-id">J7.4</code> <span class="msg-name">Track Identifier</span></span><span><span class="npg-tag">NPG 7</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Provides track identification data.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Information Management</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J7.5" data-name="IFF/SIF Management" data-conf="stub" id="J7.5">
+<summary><div class="msg-header"><span><code class="msg-id">J7.5</code> <span class="msg-name">IFF/SIF Management</span></span><span><span class="npg-tag">NPG 7</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Manages IFF/SIF transponder code assignments.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Information Management</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J7.6" data-name="Filter Management" data-conf="stub" id="J7.6">
+<summary><div class="msg-header"><span><code class="msg-id">J7.6</code> <span class="msg-name">Filter Management</span></span><span><span class="npg-tag">NPG 7</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Manages data filtering criteria for track distribution.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Information Management</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J7.7" data-name="Association" data-conf="stub" id="J7.7">
+<summary><div class="msg-header"><span><code class="msg-id">J7.7</code> <span class="msg-name">Association</span></span><span><span class="npg-tag">NPG 7</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Associates related tracks or entities.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Information Management</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<h3 id="label-8">Label 8: Information Management</h3>
+<details class="msg-entry" data-id="J8.0" data-name="Unit Designator" data-conf="stub" id="J8.0">
+<summary><div class="msg-header"><span><code class="msg-id">J8.0</code> <span class="msg-name">Unit Designator</span></span><span><span class="npg-tag">NPG 8</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Designates a unit for mission assignment or tasking.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Information Management</td></tr>
+<tr><td>NPGs</td><td>NPG 8 (Mission Management / Weapons Coordination)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J8.1" data-name="Mission Correlator Change" data-conf="stub" id="J8.1">
+<summary><div class="msg-header"><span><code class="msg-id">J8.1</code> <span class="msg-name">Mission Correlator Change</span></span><span><span class="npg-tag">NPG 8</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Changes mission correlator assignments.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Information Management</td></tr>
+<tr><td>NPGs</td><td>NPG 8 (Mission Management / Weapons Coordination)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<h3 id="label-9">Label 9: Weapons Coordination and Management</h3>
+<details class="msg-entry" data-id="J9.0" data-name="Command" data-conf="stub" id="J9.0">
+<summary><div class="msg-header"><span><code class="msg-id">J9.0</code> <span class="msg-name">Command</span></span><span><span class="npg-tag">NPG 8</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Issues commands for weapons engagement and management.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Weapons Coordination and Management</td></tr>
+<tr><td>NPGs</td><td>NPG 8 (Mission Management / Weapons Coordination)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<h3 id="label-10">Label 10: Weapons Coordination and Management</h3>
+<details class="msg-entry" data-id="J10.2" data-name="Engagement Status" data-conf="stub" id="J10.2">
+<summary><div class="msg-header"><span><code class="msg-id">J10.2</code> <span class="msg-name">Engagement Status</span></span><span><span class="npg-tag">NPG 8</span><span class="npg-tag">NPG 21</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Reports engagement status between weapons platforms and targets.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Weapons Coordination and Management</td></tr>
+<tr><td>NPGs</td><td>NPG 8 (Mission Management / Weapons Coordination), NPG 21 (Engagement Coordination)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J10.3" data-name="Handover" data-conf="stub" id="J10.3">
+<summary><div class="msg-header"><span><code class="msg-id">J10.3</code> <span class="msg-name">Handover</span></span><span><span class="npg-tag">NPG 8</span><span class="npg-tag">NPG 21</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Transfers engagement responsibility from one platform to another.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Weapons Coordination and Management</td></tr>
+<tr><td>NPGs</td><td>NPG 8 (Mission Management / Weapons Coordination), NPG 21 (Engagement Coordination)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J10.5" data-name="Controlling Unit Report" data-conf="stub" id="J10.5">
+<summary><div class="msg-header"><span><code class="msg-id">J10.5</code> <span class="msg-name">Controlling Unit Report</span></span><span><span class="npg-tag">NPG 8</span><span class="npg-tag">NPG 21</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Reports from the controlling unit on engagement status.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Weapons Coordination and Management</td></tr>
+<tr><td>NPGs</td><td>NPG 8 (Mission Management / Weapons Coordination), NPG 21 (Engagement Coordination)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J10.6" data-name="Pairing" data-conf="stub" id="J10.6">
+<summary><div class="msg-header"><span><code class="msg-id">J10.6</code> <span class="msg-name">Pairing</span></span><span><span class="npg-tag">NPG 8</span><span class="npg-tag">NPG 21</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Pairs weapons platforms with targets for engagement.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Weapons Coordination and Management</td></tr>
+<tr><td>NPGs</td><td>NPG 8 (Mission Management / Weapons Coordination), NPG 21 (Engagement Coordination)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<h3 id="label-11">Label 11: Weapons Coordination and Management</h3>
+<details class="msg-entry" data-id="J11.0" data-name="From the Weapon" data-conf="stub" id="J11.0">
+<summary><div class="msg-header"><span><code class="msg-id">J11.0</code> <span class="msg-name">From the Weapon</span></span><span><span class="npg-tag">NPG 8</span><span class="npg-tag">NPG 18</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Status reports from a weapon in flight to the controlling platform.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Weapons Coordination and Management</td></tr>
+<tr><td>NPGs</td><td>NPG 8 (Mission Management / Weapons Coordination), NPG 18 (Network Enabled Weapons)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J11.1" data-name="To the Weapon" data-conf="stub" id="J11.1">
+<summary><div class="msg-header"><span><code class="msg-id">J11.1</code> <span class="msg-name">To the Weapon</span></span><span><span class="npg-tag">NPG 8</span><span class="npg-tag">NPG 18</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Commands and updates sent to a weapon in flight.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Weapons Coordination and Management</td></tr>
+<tr><td>NPGs</td><td>NPG 8 (Mission Management / Weapons Coordination), NPG 18 (Network Enabled Weapons)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J11.2" data-name="Weapon Coordination" data-conf="stub" id="J11.2">
+<summary><div class="msg-header"><span><code class="msg-id">J11.2</code> <span class="msg-name">Weapon Coordination</span></span><span><span class="npg-tag">NPG 8</span><span class="npg-tag">NPG 18</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Coordinates weapons employment between platforms.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Weapons Coordination and Management</td></tr>
+<tr><td>NPGs</td><td>NPG 8 (Mission Management / Weapons Coordination), NPG 18 (Network Enabled Weapons)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<h3 id="label-12">Label 12: Control</h3>
+<details class="msg-entry" data-id="J12.0" data-name="Mission Assignment" data-conf="stub" id="J12.0">
+<summary><div class="msg-header"><span><code class="msg-id">J12.0</code> <span class="msg-name">Mission Assignment</span></span><span><span class="npg-tag">NPG 8</span><span class="npg-tag">NPG 9</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Assigns missions (engagement, reconnaissance, etc.) to controlled units.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Control</td></tr>
+<tr><td>NPGs</td><td>NPG 8 (Mission Management / Weapons Coordination), NPG 9 (Control)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card), Grokipedia</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J12.1" data-name="Vector" data-conf="stub" id="J12.1">
+<summary><div class="msg-header"><span><code class="msg-id">J12.1</code> <span class="msg-name">Vector</span></span><span><span class="npg-tag">NPG 8</span><span class="npg-tag">NPG 9</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Provides steering vectors to controlled aircraft.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Control</td></tr>
+<tr><td>NPGs</td><td>NPG 8 (Mission Management / Weapons Coordination), NPG 9 (Control)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J12.2" data-name="Precision Aircraft Direction" data-conf="stub" id="J12.2">
+<summary><div class="msg-header"><span><code class="msg-id">J12.2</code> <span class="msg-name">Precision Aircraft Direction</span></span><span><span class="npg-tag">NPG 8</span><span class="npg-tag">NPG 9</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Provides precise aircraft direction for intercept.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Control</td></tr>
+<tr><td>NPGs</td><td>NPG 8 (Mission Management / Weapons Coordination), NPG 9 (Control)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J12.3" data-name="Flight Path" data-conf="stub" id="J12.3">
+<summary><div class="msg-header"><span><code class="msg-id">J12.3</code> <span class="msg-name">Flight Path</span></span><span><span class="npg-tag">NPG 8</span><span class="npg-tag">NPG 9</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Defines a flight path for controlled aircraft.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Control</td></tr>
+<tr><td>NPGs</td><td>NPG 8 (Mission Management / Weapons Coordination), NPG 9 (Control)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J12.4" data-name="Controlling Unit Change" data-conf="stub" id="J12.4">
+<summary><div class="msg-header"><span><code class="msg-id">J12.4</code> <span class="msg-name">Controlling Unit Change</span></span><span><span class="npg-tag">NPG 8</span><span class="npg-tag">NPG 9</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Transfers control of a unit from one controller to another.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Control</td></tr>
+<tr><td>NPGs</td><td>NPG 8 (Mission Management / Weapons Coordination), NPG 9 (Control)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J12.5" data-name="Target/Track Correlation" data-conf="stub" id="J12.5">
+<summary><div class="msg-header"><span><code class="msg-id">J12.5</code> <span class="msg-name">Target/Track Correlation</span></span><span><span class="npg-tag">NPG 8</span><span class="npg-tag">NPG 9</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Correlates targets and tracks for engagement.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Control</td></tr>
+<tr><td>NPGs</td><td>NPG 8 (Mission Management / Weapons Coordination), NPG 9 (Control)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J12.6" data-name="Target Sorting" data-conf="stub" id="J12.6">
+<summary><div class="msg-header"><span><code class="msg-id">J12.6</code> <span class="msg-name">Target Sorting</span></span><span><span class="npg-tag">NPG 8</span><span class="npg-tag">NPG 9</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Sorts and prioritizes targets for engagement.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Control</td></tr>
+<tr><td>NPGs</td><td>NPG 8 (Mission Management / Weapons Coordination), NPG 9 (Control)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J12.7" data-name="Target Bearing" data-conf="stub" id="J12.7">
+<summary><div class="msg-header"><span><code class="msg-id">J12.7</code> <span class="msg-name">Target Bearing</span></span><span><span class="npg-tag">NPG 8</span><span class="npg-tag">NPG 9</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Reports target bearing data.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Control</td></tr>
+<tr><td>NPGs</td><td>NPG 8 (Mission Management / Weapons Coordination), NPG 9 (Control)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<h3 id="label-13">Label 13: Platform and System Status</h3>
+<details class="msg-entry" data-id="J13.0" data-name="Airfield Status" data-conf="stub" id="J13.0">
+<summary><div class="msg-header"><span><code class="msg-id">J13.0</code> <span class="msg-name">Airfield Status</span></span><span><span class="npg-tag">NPG 7</span><span class="npg-tag">NPG 8</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Reports airfield operational status.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Platform and System Status</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance), NPG 8 (Mission Management / Weapons Coordination)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J13.2" data-name="Air Platform and System Status" data-conf="stub" id="J13.2">
+<summary><div class="msg-header"><span><code class="msg-id">J13.2</code> <span class="msg-name">Air Platform and System Status</span></span><span><span class="npg-tag">NPG 7</span><span class="npg-tag">NPG 8</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Reports detailed platform and weapons system status for air platforms.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Platform and System Status</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance), NPG 8 (Mission Management / Weapons Coordination)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J13.3" data-name="Surface Platform and System Status" data-conf="stub" id="J13.3">
+<summary><div class="msg-header"><span><code class="msg-id">J13.3</code> <span class="msg-name">Surface Platform and System Status</span></span><span><span class="npg-tag">NPG 7</span><span class="npg-tag">NPG 8</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Reports detailed platform and weapons system status for surface platforms.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Platform and System Status</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance), NPG 8 (Mission Management / Weapons Coordination)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J13.4" data-name="Subsurface Platform and System Status" data-conf="stub" id="J13.4">
+<summary><div class="msg-header"><span><code class="msg-id">J13.4</code> <span class="msg-name">Subsurface Platform and System Status</span></span><span><span class="npg-tag">NPG 7</span><span class="npg-tag">NPG 8</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Reports platform and weapons system status for subsurface platforms.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Platform and System Status</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance), NPG 8 (Mission Management / Weapons Coordination)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J13.5" data-name="Land Platform and System Status" data-conf="stub" id="J13.5">
+<summary><div class="msg-header"><span><code class="msg-id">J13.5</code> <span class="msg-name">Land Platform and System Status</span></span><span><span class="npg-tag">NPG 7</span><span class="npg-tag">NPG 8</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Reports platform and weapons system status for land platforms.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Platform and System Status</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance), NPG 8 (Mission Management / Weapons Coordination)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<h3 id="label-14">Label 14: Electronic Warfare</h3>
+<details class="msg-entry" data-id="J14.0" data-name="Parametric Information" data-conf="stub" id="J14.0">
+<summary><div class="msg-header"><span><code class="msg-id">J14.0</code> <span class="msg-name">Parametric Information</span></span><span><span class="npg-tag">NPG 10</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Reports electronic warfare parametric data (emitter characteristics, signal parameters).</p>
+<table class="param-table">
+<tr><td>Category</td><td>Electronic Warfare</td></tr>
+<tr><td>NPGs</td><td>NPG 10 (Electronic Warfare)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J14.2" data-name="Electronic Warfare Control / Coordination" data-conf="stub" id="J14.2">
+<summary><div class="msg-header"><span><code class="msg-id">J14.2</code> <span class="msg-name">Electronic Warfare Control / Coordination</span></span><span><span class="npg-tag">NPG 10</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Coordinates electronic warfare operations and countermeasures.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Electronic Warfare</td></tr>
+<tr><td>NPGs</td><td>NPG 10 (Electronic Warfare)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<h3 id="label-15">Label 15: Threat Warning</h3>
+<details class="msg-entry" data-id="J15.0" data-name="Threat Warning" data-conf="stub" id="J15.0">
+<summary><div class="msg-header"><span><code class="msg-id">J15.0</code> <span class="msg-name">Threat Warning</span></span><span><span class="npg-tag">NPG 7</span><span class="npg-tag">NPG 8</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Issues threat warnings for incoming threats.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Threat Warning</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance), NPG 8 (Mission Management / Weapons Coordination)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<h3 id="label-16">Label 16: Imagery</h3>
+<details class="msg-entry" data-id="J16.0" data-name="Imagery" data-conf="stub" id="J16.0">
+<summary><div class="msg-header"><span><code class="msg-id">J16.0</code> <span class="msg-name">Imagery</span></span><span><span class="npg-tag">NPG 11</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Transfers imagery data.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Imagery</td></tr>
+<tr><td>NPGs</td><td>NPG 11 (Image Transfer)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<h3 id="label-17">Label 17: Weather</h3>
+<details class="msg-entry" data-id="J17.0" data-name="Weather Over Target" data-conf="stub" id="J17.0">
+<summary><div class="msg-header"><span><code class="msg-id">J17.0</code> <span class="msg-name">Weather Over Target</span></span><span><span class="npg-tag">NPG 7</span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Reports weather conditions over a target area.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Weather</td></tr>
+<tr><td>NPGs</td><td>NPG 7 (Surveillance)</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<h3 id="label-28">Label 28: National Use</h3>
+<details class="msg-entry" data-id="J28.0" data-name="U.S. National 1 (Army)" data-conf="stub" id="J28.0">
+<summary><div class="msg-header"><span><code class="msg-id">J28.0</code> <span class="msg-name">U.S. National 1 (Army)</span></span><span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>U.S. Army national use message.</p>
+<table class="param-table">
+<tr><td>Category</td><td>National Use</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J28.1" data-name="U.S. National 2 (Navy)" data-conf="stub" id="J28.1">
+<summary><div class="msg-header"><span><code class="msg-id">J28.1</code> <span class="msg-name">U.S. National 2 (Navy)</span></span><span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>U.S. Navy national use message.</p>
+<table class="param-table">
+<tr><td>Category</td><td>National Use</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J28.2" data-name="U.S. National 3 (Air Force)" data-conf="medium" id="J28.2">
+<summary><div class="msg-header"><span><code class="msg-id">J28.2</code> <span class="msg-name">U.S. National 3 (Air Force)</span></span><span><span class="conf conf-medium">MEDIUM</span></span></div></summary>
+<div class="content">
+<p>U.S. Air Force national use message. Also used for free text messaging.</p>
+<table class="param-table">
+<tr><td>Category</td><td>National Use</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card), SISO-STD-002-2021</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J28.3" data-name="U.S. National 4 (Marine Corps)" data-conf="stub" id="J28.3">
+<summary><div class="msg-header"><span><code class="msg-id">J28.3</code> <span class="msg-name">U.S. National 4 (Marine Corps)</span></span><span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>U.S. Marine Corps national use message.</p>
+<table class="param-table">
+<tr><td>Category</td><td>National Use</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J28.4" data-name="French National 1" data-conf="stub" id="J28.4">
+<summary><div class="msg-header"><span><code class="msg-id">J28.4</code> <span class="msg-name">French National 1</span></span><span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>French national use message 1.</p>
+<table class="param-table">
+<tr><td>Category</td><td>National Use</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J28.5" data-name="French National 2" data-conf="stub" id="J28.5">
+<summary><div class="msg-header"><span><code class="msg-id">J28.5</code> <span class="msg-name">French National 2</span></span><span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>French national use message 2.</p>
+<table class="param-table">
+<tr><td>Category</td><td>National Use</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J28.6" data-name="U.S. National 5 (NSA)" data-conf="stub" id="J28.6">
+<summary><div class="msg-header"><span><code class="msg-id">J28.6</code> <span class="msg-name">U.S. National 5 (NSA)</span></span><span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>NSA national use message.</p>
+<table class="param-table">
+<tr><td>Category</td><td>National Use</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J28.7" data-name="UK National" data-conf="stub" id="J28.7">
+<summary><div class="msg-header"><span><code class="msg-id">J28.7</code> <span class="msg-name">UK National</span></span><span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>United Kingdom national use message.</p>
+<table class="param-table">
+<tr><td>Category</td><td>National Use</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<h3 id="label-31">Label 31: Miscellaneous</h3>
+<details class="msg-entry" data-id="J31.0" data-name="Over-the-Air Rekeying Management" data-conf="stub" id="J31.0">
+<summary><div class="msg-header"><span><code class="msg-id">J31.0</code> <span class="msg-name">Over-the-Air Rekeying Management</span></span><span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Manages over-the-air cryptographic rekeying operations.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Miscellaneous</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J31.1" data-name="Over-the-Air Rekeying" data-conf="stub" id="J31.1">
+<summary><div class="msg-header"><span><code class="msg-id">J31.1</code> <span class="msg-name">Over-the-Air Rekeying</span></span><span><span class="conf conf-stub">STUB</span></span></div></summary>
+<div class="content">
+<p>Performs the actual over-the-air rekeying of cryptographic variables.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Miscellaneous</td></tr>
+<tr><td>Source</td><td>Wireshark dissector (Viasat card)</td></tr>
+</table>
+<p style="color:var(--fg3);font-style:italic;">No field-level data available from open sources. Requires MIL-STD-6016 / STANAG 5516 access.</p>
+</div></details>
+<details class="msg-entry" data-id="J31.7" data-name="No Statement" data-conf="high" id="J31.7">
+<summary><div class="msg-header"><span><code class="msg-id">J31.7</code> <span class="msg-name">No Statement</span></span><span><span class="conf conf-high">HIGH</span></span></div></summary>
+<div class="content">
+<p>A 1-word message used to pad time slots to 3, 6, or 12 words. Contains no tactical information.</p>
+<table class="param-table">
+<tr><td>Category</td><td>Miscellaneous</td></tr>
+<tr><td>Word Count</td><td>1</td></tr>
+<tr><td>Source</td><td>SISO-STD-002-2021 §4.1.1, Wireshark dissector (Viasat card)</td></tr>
+</table>
+<h4>Fields</h4>
+<table><tr><th>Bit Offset</th><th>Bit Width</th><th>Field Name</th><th>Type</th><th>Values</th><th>Description</th><th>Source</th><th>Conf</th></tr>
+<tr><td>0</td><td>2</td><td>Word Format</td><td><code>enum</code></td><td>0=Initial</td><td></td><td style="font-size:0.75rem"></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>2</td><td>5</td><td>Label</td><td><code>uint</code></td><td>31=Miscellaneous</td><td></td><td style="font-size:0.75rem"></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>7</td><td>3</td><td>Sublabel</td><td><code>uint</code></td><td>7=No Statement</td><td></td><td style="font-size:0.75rem"></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>10</td><td>3</td><td>MLI</td><td><code>uint</code></td><td>0=1 word</td><td></td><td style="font-size:0.75rem"></td><td><span class="conf conf-high">HIGH</span></td></tr>
+<tr><td>13</td><td>57</td><td>Padding</td><td><code>padding</code></td><td></td><td>Set to all zeros or ignored</td><td style="font-size:0.75rem"></td><td><span class="conf conf-medium">MEDIUM</span></td></tr>
+</table>
+</div></details>
+<h2 id="terminals">Terminal Types</h2>
+<table><tr><th>Terminal</th><th>Weight</th><th>Platform</th><th>Conf</th></tr>
+<tr><td>JTIDS Class 1</td><td>250 lbs</td><td>Large aircraft (E-3 AWACS)</td><td><span class="conf conf-medium">MEDIUM</span></td></tr>
+<tr><td>JTIDS Class 2</td><td>128 lbs</td><td>Ground/mobile</td><td><span class="conf conf-medium">MEDIUM</span></td></tr>
+<tr><td>MIDS LVT(1)</td><td>42.5 lbs</td><td>Fighter aircraft</td><td><span class="conf conf-medium">MEDIUM</span></td></tr>
+<tr><td>MIDS LVT(2) / AN/USQ-140(V)</td><td>—</td><td>Command posts</td><td><span class="conf conf-medium">MEDIUM</span></td></tr>
+<tr><td>MIDS JTRS</td><td>50.6 lbs</td><td>Multi-waveform capable</td><td><span class="conf conf-medium">MEDIUM</span></td></tr>
+</table>
+<h2 id="gaps">Gaps &amp; Limitations</h2>
+<div class="warning-box">
+<p><strong>This reconstruction is fundamentally limited by what is publicly available.</strong></p>
+</div>
+<h3>What We Do NOT Have</h3>
+<ul>
+<li><strong>DFI/DUI Definitions:</strong> The Data Field Identifier / Data Use Identifier system that defines exact bit-level field layouts within each J-series message word is contained in MIL-STD-6016 and STANAG 5516 — both CONTROLLED/RESTRICTED documents not available to the public.</li>
+<li><strong>Complete Field Layouts:</strong> For the vast majority of messages (61 of 69), we have only the message name and NPG association. Exact bit positions, field widths, encoding schemes, and value enumerations are unknown.</li>
+<li><strong>Continuation/Extension Words:</strong> While we know the word format structure (Initial/Continuation/Extension), the specific field layouts of C and E words for each message type are not publicly documented.</li>
+<li><strong>Network Entry Protocol Details:</strong> The precise handshake sequences, challenge/response formats, and timing for JTIDS network entry are controlled.</li>
+<li><strong>Crypto Variables:</strong> TSEC/MSEC key formats, CVLL assignment procedures, and rekeying protocols are classified.</li>
+<li><strong>JREAP Encapsulation Details:</strong> While JREAP-A/B/C existence is documented, detailed PDU formats beyond basic framing are not fully public.</li>
+<li><strong>Full NPG-to-Message Mapping:</strong> The complete assignment of messages to NPGs (especially for weapons coordination and national messages) is only partially available.</li>
+<li><strong>Messages J4.x, J18-27.x, J29-30.x:</strong> These label ranges appear unused or reserved, but we cannot confirm this without access to the standard.</li>
+</ul>
+
+<h3>What We Do Have (and Confidence Levels)</h3>
+<ul>
+<li><strong>Physical Layer:</strong> HIGH confidence — frequency band, modulation, TDMA timing are well-documented in public literature.</li>
+<li><strong>Link Layer Framing:</strong> HIGH confidence — word structure, header format, packing modes from SISO-STD-002 and Wireshark dissector.</li>
+<li><strong>Message Names &amp; NPGs:</strong> HIGH confidence — 69 message types enumerated in the Wireshark dissector (DSTO-TN-1257).</li>
+<li><strong>PPLI &amp; Track Fields:</strong> LOW-MEDIUM confidence — partial field names inferred from simulation papers, flight sim docs, and the AFIT thesis. Bit offsets mostly unknown.</li>
+<li><strong>Simulation Header:</strong> HIGH confidence — fully specified in SISO-STD-002-2021.</li>
+</ul>
+
+<h3>Methodology</h3>
+<p>This document was built by:</p>
+<ol>
+<li>Extracting text from SISO-STD-002-2021, DSTO-TN-1257, and the AFIT IP-over-Link-16 thesis</li>
+<li>Parsing the Wireshark dissector source code for message type enumerations</li>
+<li>Cross-referencing web sources (Wikipedia, Signal ID Wiki, Grokipedia, flight sim forums)</li>
+<li>Assigning confidence levels based on source quality and cross-reference count</li>
+<li>Generating an intermediate JSON schema, then this HTML reference from it</li>
+</ol>
+
+<h2 id="sources">Sources &amp; References</h2>
+<table>
+<tr><th>Source</th><th>Type</th><th>Access</th><th>Used For</th></tr>
+<tr><td><strong>SISO-STD-002-2021</strong><br>Standard for Link 16 Simulation v2.0</td><td>Simulation Standard</td><td>Public (SISO)</td><td>Header format, simulation network header, communication modes, TDMA timing</td></tr>
+<tr><td><strong>DSTO-TN-1257</strong><br>"Representing Link 16 in DIS" — Wireshark Patch</td><td>Technical Note</td><td>Public (DSTO)</td><td>69 message type names, 22 NPGs, word format parsing, label/sublabel enumeration</td></tr>
+<tr><td><strong>AFIT Thesis</strong><br>"IP over Link 16"</td><td>Academic Thesis</td><td>Public (DTIC)</td><td>Packing modes, data rates, TDMA details</td></tr>
+<tr><td><strong>ADA404334</strong><br>SyntheSys Link 16 Message Table</td><td>Reference Card</td><td>Public (DTIC)</td><td>Message names cross-reference, NPG assignments</td></tr>
+<tr><td><strong>CJCSM 6520.01B</strong><br>Joint Multi-TDL Operating Procedures</td><td>DoD Manual</td><td>Partially Public</td><td>Operational procedures, message usage context</td></tr>
+<tr><td><strong>SimTecT 2010-64</strong><br>"Open Source Link 16 Analyser" — Robertson &amp; Ross</td><td>Conference Paper</td><td>Public</td><td>Message analysis methodology, validation approach</td></tr>
+<tr><td><strong>Signal Identification Wiki</strong></td><td>Community Wiki</td><td>Public</td><td>Physical layer parameters, modulation details</td></tr>
+<tr><td><strong>Wikipedia: Link 16</strong></td><td>Encyclopedia</td><td>Public</td><td>General overview, cross-reference</td></tr>
+<tr><td><strong>Viasat NPG Reference Card</strong></td><td>Vendor Reference</td><td>Public</td><td>NPG-to-message assignments</td></tr>
+</table>
+
+<h3>Governing Standards (Not Available)</h3>
+<table>
+<tr><th>Standard</th><th>Title</th><th>Access</th></tr>
+<tr><td>MIL-STD-6016</td><td>Tactical Data Link 16 Message Standard</td><td>CONTROLLED — US DoD</td></tr>
+<tr><td>STANAG 5516</td><td>NATO Tactical Data Exchange — Link 16</td><td>NATO RESTRICTED</td></tr>
+<tr><td>STANAG 5602</td><td>SIMPLE Interface Standard</td><td>NATO LIMITED</td></tr>
+</table>
+
+<footer style="margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border);color:var(--fg3);font-size:0.8rem;">
+<p>Ersatz MIL-STD-6016 — An open-source reconstruction. Not affiliated with US DoD, NATO, or any defense contractor.</p>
+<p>Source: <a href="https://github.com/liotier/Ersatz-MIL-STD-6016">github.com/liotier/Ersatz-MIL-STD-6016</a></p>
+</footer>
+
+<script>
+(function() {
+  const search = document.getElementById('search');
+  const entries = document.querySelectorAll('.msg-entry');
+  const filterHigh = document.getElementById('filter-high');
+  const filterMedium = document.getElementById('filter-medium');
+  const filterLow = document.getElementById('filter-low');
+  const filterStub = document.getElementById('filter-stub');
+  const filterFields = document.getElementById('filter-fields-only');
+  
+  function applyFilters() {
+    const q = search.value.toLowerCase().trim();
+    const showHigh = filterHigh.checked;
+    const showMedium = filterMedium.checked;
+    const showLow = filterLow.checked;
+    const showStub = filterStub.checked;
+    const fieldsOnly = filterFields.checked;
+    
+    entries.forEach(el => {
+      const id = (el.dataset.id || '').toLowerCase();
+      const name = (el.dataset.name || '').toLowerCase();
+      const conf = el.dataset.conf || '';
+      const text = el.textContent.toLowerCase();
+      
+      let visible = true;
+      
+      // Confidence filter
+      if (conf === 'high' && !showHigh) visible = false;
+      if (conf === 'medium' && !showMedium) visible = false;
+      if (conf === 'low' && !showLow) visible = false;
+      if (conf === 'stub' && !showStub) visible = false;
+      
+      // Fields-only filter
+      if (fieldsOnly && !el.querySelector('table:not(.param-table)')) visible = false;
+      
+      // Search filter
+      if (q && visible) {
+        visible = id.includes(q) || name.includes(q) || text.includes(q);
+      }
+      
+      el.classList.toggle('hidden', !visible);
+      
+      // Auto-open matching entries
+      if (visible && q) {
+        el.open = true;
+      }
+    });
+  }
+  
+  search.addEventListener('input', applyFilters);
+  [filterHigh, filterMedium, filterLow, filterStub, filterFields].forEach(cb => {
+    cb.addEventListener('change', applyFilters);
+  });
+  
+  // Handle deep links
+  if (window.location.hash) {
+    const target = document.querySelector(window.location.hash);
+    if (target && target.tagName === 'DETAILS') {
+      target.open = true;
+      target.scrollIntoView({behavior: 'smooth'});
+    }
+  }
+  
+  // Expand all / collapse all via keyboard
+  document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.key === 'e') {
+      e.preventDefault();
+      const allOpen = Array.from(entries).every(el => el.open);
+      entries.forEach(el => { if (!el.classList.contains('hidden')) el.open = !allOpen; });
+    }
+  });
+})();
+</script>
+</body>
+</html>

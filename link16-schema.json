@@ -1,0 +1,736 @@
+{
+  "schema_version": "1.0.0",
+  "title": "Ersatz MIL-STD-6016: Open-Source Link 16 / TADIL-J Message Schema",
+  "description": "Reconstructed from publicly available documentation. NOT a substitute for MIL-STD-6016 or STANAG 5516.",
+  "generated": "2026-03-10",
+  "governing_standards": {
+    "MIL-STD-6016": "Department of Defense Interface Standard - Tactical Data Link (TDL) 16 Message Standard (CONTROLLED)",
+    "STANAG_5516": "NATO Tactical Data Exchange - Link 16 (CONTROLLED)",
+    "SISO-STD-002-2021": "Standard for Link 16 Simulation Version 2.0 (PUBLIC)",
+    "STANAG_5602": "Standard Interface for Multiple Platform Link Evaluation - SIMPLE (LIMITED)"
+  },
+  "physical_layer": {
+    "frequency_band": {
+      "range_mhz": [960, 1215],
+      "operational_range_mhz": [969, 1206],
+      "subbands": [
+        {"range_mhz": [969, 1008], "description": "Lower subband"},
+        {"range_mhz": [1053, 1065], "description": "Middle subband"},
+        {"range_mhz": [1113, 1206], "description": "Upper subband"}
+      ],
+      "center_frequencies": 51,
+      "frequency_spacing_mhz": 3,
+      "center_frequency_hz": 1131000000,
+      "bandwidth_hz": 240000000,
+      "confidence": "HIGH",
+      "source": "SISO-STD-002-2021, Signal ID Wiki, AFIT Thesis"
+    },
+    "frequency_hopping": {
+      "enabled_modes": [1],
+      "disabled_modes": [2, 4],
+      "hop_interval_us": 13,
+      "hops_per_second": 76923,
+      "pattern": "Pseudo-random, determined by net number and TSEC cryptovariable",
+      "confidence": "HIGH",
+      "source": "SISO-STD-002-2021, Signal ID Wiki, AFIT Thesis"
+    },
+    "modulation": {
+      "type": "CPSM (Continuous Phase Shift Modulation)",
+      "chip_modulation": "MSK (Minimum Shift Keying)",
+      "symbol_encoding": "CCSK (Cyclic Code Shift Keying)",
+      "chip_rate_mbps": 5,
+      "chips_per_symbol": 32,
+      "bits_per_pulse": 5,
+      "confidence": "HIGH",
+      "source": "Signal ID Wiki, Wikipedia"
+    },
+    "pulse_structure": {
+      "pulse_duration_us": 6.4,
+      "guard_time_us": 6.6,
+      "total_pulse_interval_us": 13.0,
+      "single_pulse_description": "6.4 µs burst of CPSM at 5 Mbps",
+      "double_pulse_description": "26 µs packet (two consecutive pulses)",
+      "confidence": "HIGH",
+      "source": "Signal ID Wiki, Wikipedia"
+    },
+    "error_correction": {
+      "type": "Reed-Solomon",
+      "decoding": "Hard Decision Decoding (HDD)",
+      "ratio": "16 bits encoded per 15 bits data",
+      "confidence": "HIGH",
+      "source": "Signal ID Wiki, AFIT Thesis"
+    },
+    "security": {
+      "MSEC": {
+        "description": "Message Security - link layer encryption of message data",
+        "confidence": "HIGH"
+      },
+      "TSEC": {
+        "description": "Transmission Security - physical layer security",
+        "features": [
+          "Random message jittering",
+          "Symbol interleaving",
+          "Chip scrambling",
+          "Random frequency hopping"
+        ],
+        "confidence": "HIGH"
+      }
+    },
+    "communication_modes": [
+      {"mode": 1, "frequency_hopping": true, "data_encrypted": true, "description": "Normal JTIDS mode", "confidence": "HIGH"},
+      {"mode": 2, "frequency_hopping": false, "data_encrypted": true, "description": "Narrowband, fixed 969 MHz", "confidence": "HIGH"},
+      {"mode": 3, "frequency_hopping": null, "data_encrypted": null, "description": "Not used", "confidence": "HIGH"},
+      {"mode": 4, "frequency_hopping": false, "data_encrypted": false, "description": "No encryption, fixed 969 MHz", "confidence": "HIGH"}
+    ],
+    "transmit_power_watts": 200,
+    "range_nm": 300,
+    "confidence": "HIGH",
+    "source": "SISO-STD-002-2021 Table 1, Grokipedia"
+  },
+  "tdma_structure": {
+    "time_slot": {
+      "duration_ms": 7.8125,
+      "duration_fraction": "1/128 second",
+      "slots_per_second": 128,
+      "confidence": "HIGH",
+      "source": "SISO-STD-002-2021"
+    },
+    "time_frame": {
+      "duration_s": 12,
+      "slots_per_frame": 1536,
+      "confidence": "HIGH",
+      "source": "Grokipedia, AFIT Thesis"
+    },
+    "epoch": {
+      "duration_minutes": 12.8,
+      "total_slots": 98304,
+      "sets": ["A", "B", "C"],
+      "slots_per_set": 32768,
+      "epochs_per_day": 112.5,
+      "confidence": "HIGH",
+      "source": "SISO-STD-002-2021"
+    },
+    "time_slot_id_format": {
+      "total_bits": 32,
+      "time_slot_number_bits": "0-16 (17 bits, 0-98303)",
+      "padding_bits": "17-23",
+      "epoch_number_bits": "24-31 (0-112)",
+      "no_statement_value": 4294967295,
+      "confidence": "HIGH",
+      "source": "SISO-STD-002-2021 Table 8"
+    },
+    "stacked_nets": {
+      "net_number_bits": 7,
+      "net_number_range": [0, 127],
+      "description": "Independent groups of JUs on different net numbers share same time slots",
+      "confidence": "HIGH",
+      "source": "SISO-STD-002-2021"
+    }
+  },
+  "link_layer": {
+    "header_word": {
+      "total_bits": 48,
+      "information_bits": 35,
+      "padding_bits": 13,
+      "encoding": "Reed-Solomon code word",
+      "fields": [
+        {"name": "Time Slot Type", "bit_range": "0-2", "bits": 3, "confidence": "HIGH", "source": "SISO-STD-002-2021 Table 9"},
+        {"name": "Relay Transmission Indicator", "bit_range": "3", "bits": 1, "confidence": "HIGH", "source": "SISO-STD-002-2021 Table 9"},
+        {"name": "Source Track Number", "bit_range": "4-18", "bits": 15, "description": "STN of the sender (octal)", "confidence": "HIGH", "source": "SISO-STD-002-2021 Table 9"},
+        {"name": "Secure Data Unit Serial Number", "bit_range": "19-34", "bits": 16, "confidence": "HIGH", "source": "SISO-STD-002-2021 Table 9"},
+        {"name": "Padding", "bit_range": "35-47", "bits": 13, "confidence": "HIGH", "source": "SISO-STD-002-2021 Table 9"}
+      ],
+      "confidence": "HIGH",
+      "source": "SISO-STD-002-2021 Table 9"
+    },
+    "message_word": {
+      "total_bits": 80,
+      "data_bits": 70,
+      "parity_bits": 5,
+      "padding_bits": 5,
+      "description": "75-bit message word (70 data + 5 parity) padded to 80 bits",
+      "confidence": "HIGH",
+      "source": "SISO-STD-002-2021, DSTO-TN-1257"
+    },
+    "word_formats": [
+      {
+        "type": "Initial Word",
+        "value": 0,
+        "fields": [
+          {"name": "Word Format", "bit_range": "0-1", "bits": 2, "value": 0, "confidence": "HIGH"},
+          {"name": "Label", "bit_range": "2-6", "bits": 5, "description": "Message category (0-31)", "confidence": "HIGH"},
+          {"name": "Sublabel", "bit_range": "7-9", "bits": 3, "description": "Message subcategory (0-7)", "confidence": "HIGH"},
+          {"name": "Message Length Indicator", "bit_range": "10-12", "bits": 3, "description": "Number of words in message", "confidence": "HIGH"},
+          {"name": "Message Data", "bit_range": "13-69", "bits": 57, "description": "Message-specific payload", "confidence": "HIGH"},
+          {"name": "Parity", "bit_range": "70-74", "bits": 5, "confidence": "HIGH"}
+        ],
+        "source": "DSTO-TN-1257 Figure 1, Wireshark dissector"
+      },
+      {
+        "type": "Extension Word",
+        "value": 2,
+        "fields": [
+          {"name": "Word Format", "bit_range": "0-1", "bits": 2, "value": 2, "confidence": "HIGH"},
+          {"name": "Message Data", "bit_range": "2-69", "bits": 68, "description": "Continuation of message payload", "confidence": "HIGH"},
+          {"name": "Parity", "bit_range": "70-74", "bits": 5, "confidence": "HIGH"}
+        ],
+        "source": "DSTO-TN-1257, Wireshark dissector"
+      },
+      {
+        "type": "Continuation Word",
+        "value": 1,
+        "fields": [
+          {"name": "Word Format", "bit_range": "0-1", "bits": 2, "value": 1, "confidence": "HIGH"},
+          {"name": "Continuation Word Label", "bit_range": "2-6", "bits": 5, "description": "Identifies continuation word type", "confidence": "HIGH"},
+          {"name": "Message Data", "bit_range": "7-69", "bits": 63, "description": "Continuation payload", "confidence": "HIGH"},
+          {"name": "Parity", "bit_range": "70-74", "bits": 5, "confidence": "HIGH"}
+        ],
+        "source": "DSTO-TN-1257, Wireshark dissector"
+      }
+    ],
+    "packing_modes": [
+      {
+        "name": "Standard (STD)",
+        "words_per_slot": 3,
+        "data_bits_per_slot": 210,
+        "data_bits_with_parity": 225,
+        "data_rate_kbps": 26.88,
+        "data_rate_with_parity_kbps": 28.80,
+        "data_rate_with_edac_kbps": 59.52,
+        "confidence": "HIGH",
+        "source": "AFIT Thesis, DTIC ADA404334"
+      },
+      {
+        "name": "Packed-2 (P2)",
+        "words_per_slot": 6,
+        "data_bits_per_slot": 420,
+        "data_bits_with_parity": 450,
+        "data_rate_kbps": 53.76,
+        "data_rate_with_parity_kbps": 57.60,
+        "confidence": "HIGH",
+        "source": "AFIT Thesis, DTIC ADA404334"
+      },
+      {
+        "name": "Packed-4 Single Pulse (P4-SP)",
+        "words_per_slot": 12,
+        "data_bits_per_slot": 840,
+        "data_bits_with_parity": 900,
+        "data_rate_kbps": 107.52,
+        "data_rate_with_parity_kbps": 115.20,
+        "confidence": "HIGH",
+        "source": "AFIT Thesis, DTIC ADA404334"
+      },
+      {
+        "name": "Packed-4 Double Pulse (P4-DP)",
+        "words_per_slot": 12,
+        "pulse_type": "double",
+        "description": "Same word count as P4-SP but uses double-pulse encoding for improved jam resistance",
+        "confidence": "MEDIUM",
+        "source": "Wikipedia, Grokipedia"
+      }
+    ],
+    "max_throughput": {
+      "words_per_second": 1536,
+      "calculation": "12 words/slot × 128 slots/second",
+      "confidence": "HIGH",
+      "source": "SISO-STD-002-2021 §4.1.1"
+    }
+  },
+  "simulation_network_header": {
+    "description": "SISO-STD-002 Link 16 Simulation Network Header (simulation-only construct)",
+    "total_bits": 160,
+    "fields": [
+      {"name": "NPG Number", "bits": 16, "type": "uint16", "range": "0-511", "confidence": "HIGH"},
+      {"name": "Net Number", "bits": 8, "type": "uint8", "range": "0-127", "confidence": "HIGH"},
+      {"name": "TSEC CVLL", "bits": 8, "type": "uint8", "range": "0-127, 255=no statement", "confidence": "HIGH"},
+      {"name": "MSEC CVLL", "bits": 8, "type": "uint8", "range": "0-127, 255=no statement", "confidence": "HIGH"},
+      {"name": "Message Type Identifier", "bits": 8, "type": "enum", "confidence": "HIGH"},
+      {"name": "SISO-STD-002 Version", "bits": 8, "type": "enum", "values": {"0": "SISO-STD-002-2006 (byte swapping)", "1": "SISO-STD-002-2021 (bit stream)"}, "confidence": "HIGH"},
+      {"name": "Link 16 Version", "bits": 8, "type": "enum", "range": "0-255", "confidence": "HIGH"},
+      {"name": "Time Slot ID", "bits": 32, "type": "uint32", "confidence": "HIGH"},
+      {"name": "Perceived Transmit Time", "bits": 64, "type": "NTP timestamp", "confidence": "HIGH"}
+    ],
+    "message_type_identifiers": [
+      {"value": 0, "name": "JTIDS Header/Messages", "description": "Fixed Word Format J-series messages"},
+      {"value": 1, "name": "RTT A/B", "description": "Round Trip Timing Addressed/Broadcast"},
+      {"value": 2, "name": "RTT Reply", "description": "Round Trip Timing Reply"},
+      {"value": 3, "name": "JTIDS Voice CVSD", "description": "Continuous Variable Slope Delta voice"},
+      {"value": 4, "name": "JTIDS Voice LPC10", "description": "Linear Predictive Coding 10 voice"},
+      {"value": 5, "name": "JTIDS Voice LPC12", "description": "Linear Predictive Coding 12 voice"},
+      {"value": 6, "name": "JTIDS LET", "description": "Link 16 Enhanced Throughput"},
+      {"value": 7, "name": "VMF", "description": "Variable Message Format"}
+    ],
+    "source": "SISO-STD-002-2021 Tables 6, 8"
+  },
+  "network_participation_groups": [
+    {"npg": 1, "name": "Initial Entry", "function": "Network entry and synchronization", "associated_messages": ["J0.0"], "confidence": "HIGH", "source": "DSTO-TN-1257 Wireshark dissector, Viasat NPG card"},
+    {"npg": 2, "name": "RTT-A", "function": "Round Trip Timing Addressed - active synchronization with specific terminal", "associated_messages": ["RTT A"], "confidence": "HIGH", "source": "DSTO-TN-1257 Wireshark dissector"},
+    {"npg": 3, "name": "RTT-B", "function": "Round Trip Timing Broadcast - active synchronization broadcast", "associated_messages": ["RTT B"], "confidence": "HIGH", "source": "DSTO-TN-1257 Wireshark dissector"},
+    {"npg": 4, "name": "Network Management", "function": "Network management and control messages", "associated_messages": ["J0.x", "J1.x"], "confidence": "HIGH", "source": "DSTO-TN-1257 Wireshark dissector"},
+    {"npg": 5, "name": "PPLI and Status", "function": "Precise Participant Location and Identification", "associated_messages": ["J2.0", "J2.2", "J2.3", "J2.4", "J2.5", "J2.6"], "confidence": "HIGH", "source": "DSTO-TN-1257 Wireshark dissector, multiple sources"},
+    {"npg": 6, "name": "PPLI and Status", "function": "Precise Participant Location and Identification (additional)", "associated_messages": ["J2.0", "J2.2", "J2.3", "J2.4", "J2.5", "J2.6"], "confidence": "HIGH", "source": "DSTO-TN-1257 Wireshark dissector, multiple sources"},
+    {"npg": 7, "name": "Surveillance", "function": "Track reporting - air, surface, subsurface, land, space, EW products", "associated_messages": ["J3.0", "J3.1", "J3.2", "J3.3", "J3.4", "J3.5", "J3.6", "J3.7", "J7.0", "J7.1", "J7.2", "J7.3", "J7.4", "J7.5", "J7.6", "J7.7"], "confidence": "HIGH", "source": "Multiple sources"},
+    {"npg": 8, "name": "Mission Management / Weapons Coordination", "function": "Mission management, weapons coordination, and engagement", "associated_messages": ["J8.0", "J8.1", "J9.0", "J10.2", "J10.3", "J10.5", "J10.6", "J11.0", "J11.1", "J11.2", "J12.0", "J12.1", "J12.2", "J12.3", "J12.4", "J12.5", "J12.6", "J12.7"], "confidence": "HIGH", "source": "DSTO-TN-1257 Wireshark dissector"},
+    {"npg": 9, "name": "Control", "function": "Air control - used by C2JUs to control non-C2JUs", "associated_messages": ["J12.0", "J12.1", "J12.2", "J12.3", "J12.4", "J12.5", "J12.6", "J12.7"], "confidence": "HIGH", "source": "DSTO-TN-1257 Wireshark dissector, Course Hero"},
+    {"npg": 10, "name": "Electronic Warfare", "function": "Electronic Warfare parametric data and coordination", "associated_messages": ["J14.0", "J14.2"], "confidence": "HIGH", "source": "Multiple sources"},
+    {"npg": 11, "name": "Image Transfer", "function": "Imagery data transfer", "associated_messages": ["J16.0"], "confidence": "HIGH", "source": "DSTO-TN-1257 Wireshark dissector"},
+    {"npg": 12, "name": "Voice A", "function": "JTIDS voice channel A", "associated_messages": [], "confidence": "HIGH", "source": "DSTO-TN-1257 Wireshark dissector"},
+    {"npg": 13, "name": "Voice B", "function": "JTIDS voice channel B", "associated_messages": [], "confidence": "HIGH", "source": "DSTO-TN-1257 Wireshark dissector"},
+    {"npg": 14, "name": "Indirect PPLI", "function": "Indirect Precise Participant Location and Identification (US Navy usage)", "associated_messages": ["J2.0"], "confidence": "MEDIUM", "source": "DTIC ADA404334"},
+    {"npg": 15, "name": "US Army Reserved", "function": "Reserved for US Army joint use", "associated_messages": [], "confidence": "MEDIUM", "source": "DTIC ADA404334"},
+    {"npg": 16, "name": "US Army Reserved", "function": "Reserved for US Army joint use", "associated_messages": [], "confidence": "MEDIUM", "source": "DTIC ADA404334"},
+    {"npg": 18, "name": "Network Enabled Weapons", "function": "Weapons control and network-enabled weapons data", "associated_messages": ["J11.0", "J11.1", "J11.2"], "confidence": "HIGH", "source": "DSTO-TN-1257 Wireshark dissector"},
+    {"npg": 19, "name": "Fighter-to-Fighter A", "function": "Direct fighter-to-fighter communications channel A", "associated_messages": [], "confidence": "HIGH", "source": "DSTO-TN-1257 Wireshark dissector"},
+    {"npg": 20, "name": "Fighter-to-Fighter B", "function": "Direct fighter-to-fighter communications channel B", "associated_messages": [], "confidence": "HIGH", "source": "DSTO-TN-1257 Wireshark dissector"},
+    {"npg": 21, "name": "Engagement Coordination", "function": "Engagement coordination and deconfliction", "associated_messages": ["J10.2", "J10.3", "J10.5", "J10.6"], "confidence": "HIGH", "source": "DSTO-TN-1257 Wireshark dissector"},
+    {"npg": 25, "name": "US Army Reserved", "function": "Reserved for US Army joint use", "associated_messages": [], "confidence": "MEDIUM", "source": "DTIC ADA404334"},
+    {"npg": 27, "name": "Joint Net PPLI", "function": "Joint network Precise Participant Location and Identification", "associated_messages": ["J2.0", "J2.2", "J2.3", "J2.4", "J2.5", "J2.6"], "confidence": "HIGH", "source": "DSTO-TN-1257 Wireshark dissector"},
+    {"npg": 28, "name": "Distributed Network Management", "function": "Distributed network management functions", "associated_messages": ["J0.x", "J1.x"], "confidence": "HIGH", "source": "DSTO-TN-1257 Wireshark dissector"}
+  ],
+  "label_categories": [
+    {"label": 0, "category": "Network Management", "confidence": "HIGH"},
+    {"label": 1, "category": "Network Management", "confidence": "HIGH"},
+    {"label": 2, "category": "Precise Participant Location and Identification", "confidence": "HIGH"},
+    {"label": 3, "category": "Surveillance", "confidence": "HIGH"},
+    {"label": 4, "category": "Reserved/Unknown", "confidence": "STUB"},
+    {"label": 5, "category": "Anti-Submarine Warfare", "confidence": "HIGH"},
+    {"label": 6, "category": "Intelligence", "confidence": "HIGH"},
+    {"label": 7, "category": "Information Management", "confidence": "HIGH"},
+    {"label": 8, "category": "Information Management", "confidence": "HIGH"},
+    {"label": 9, "category": "Weapons Coordination and Management", "confidence": "HIGH"},
+    {"label": 10, "category": "Weapons Coordination and Management", "confidence": "HIGH"},
+    {"label": 11, "category": "Weapons Coordination and Management", "confidence": "HIGH"},
+    {"label": 12, "category": "Control", "confidence": "HIGH"},
+    {"label": 13, "category": "Platform and System Status", "confidence": "HIGH"},
+    {"label": 14, "category": "Electronic Warfare", "confidence": "HIGH"},
+    {"label": 15, "category": "Threat Warning", "confidence": "HIGH"},
+    {"label": 16, "category": "Imagery", "confidence": "HIGH"},
+    {"label": 17, "category": "Weather", "confidence": "HIGH"},
+    {"label": 18, "category": "Reserved/Unknown", "confidence": "STUB"},
+    {"label": 19, "category": "Reserved/Unknown", "confidence": "STUB"},
+    {"label": 20, "category": "Reserved/Unknown", "confidence": "STUB"},
+    {"label": 21, "category": "Reserved/Unknown", "confidence": "STUB"},
+    {"label": 22, "category": "Reserved/Unknown", "confidence": "STUB"},
+    {"label": 23, "category": "Reserved/Unknown", "confidence": "STUB"},
+    {"label": 24, "category": "Reserved/Unknown", "confidence": "STUB"},
+    {"label": 25, "category": "Reserved/Unknown", "confidence": "STUB"},
+    {"label": 26, "category": "Reserved/Unknown", "confidence": "STUB"},
+    {"label": 27, "category": "Reserved/Unknown", "confidence": "STUB"},
+    {"label": 28, "category": "National Use", "confidence": "HIGH"},
+    {"label": 29, "category": "National Use", "confidence": "HIGH"},
+    {"label": 30, "category": "National Use", "confidence": "HIGH"},
+    {"label": 31, "category": "Miscellaneous", "confidence": "HIGH"}
+  ],
+  "messages": [
+    {
+      "label": 0, "sublabel": 0, "id": "J0.0", "name": "Initial Entry",
+      "category": "Network Management", "npgs": [1, 4, 28],
+      "description": "Net entry message transmitted by NTR/IEJU. Contains time slot assignments and network synchronization data. Transmitted in pairs, typically every 12 seconds in time slot A-0-6.",
+      "word_count": null, "packing_mode": "Standard",
+      "fields": [],
+      "confidence": "MEDIUM",
+      "notes": "Field-level detail requires MIL-STD-6016. Used for initial and coarse synchronization.",
+      "source": "SISO-STD-002-2021, Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 0, "sublabel": 1, "id": "J0.1", "name": "Test",
+      "category": "Network Management", "npgs": [4],
+      "description": "Network test message.",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 0, "sublabel": 2, "id": "J0.2", "name": "Network Time Update",
+      "category": "Network Management", "npgs": [4],
+      "description": "Provides network time corrections and updates.",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 0, "sublabel": 3, "id": "J0.3", "name": "Time Slot Assignment",
+      "category": "Network Management", "npgs": [4],
+      "description": "Assigns time slots to JUs on the network.",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 0, "sublabel": 4, "id": "J0.4", "name": "Radio Relay Control",
+      "category": "Network Management", "npgs": [4],
+      "description": "Controls radio relay operations for beyond-line-of-sight messaging.",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 0, "sublabel": 5, "id": "J0.5", "name": "Repromulgation Relay",
+      "category": "Network Management", "npgs": [4],
+      "description": "Controls repromulgation (retransmission) of messages via relay.",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 0, "sublabel": 6, "id": "J0.6", "name": "Communication Control",
+      "category": "Network Management", "npgs": [4],
+      "description": "Communication control and network management directives.",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 0, "sublabel": 7, "id": "J0.7", "name": "Time Slot Reallocation",
+      "category": "Network Management", "npgs": [4],
+      "description": "Dynamic reallocation of time slots during network operations.",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 1, "sublabel": 0, "id": "J1.0", "name": "Connectivity Interrogation",
+      "category": "Network Management", "npgs": [4],
+      "description": "Interrogates network connectivity status.",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 1, "sublabel": 1, "id": "J1.1", "name": "Connectivity Status",
+      "category": "Network Management", "npgs": [4],
+      "description": "Reports network connectivity status in response to interrogation.",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 1, "sublabel": 2, "id": "J1.2", "name": "Route Establishment",
+      "category": "Network Management", "npgs": [4],
+      "description": "Establishes communication routes through the network.",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 1, "sublabel": 3, "id": "J1.3", "name": "Acknowledgment",
+      "category": "Network Management", "npgs": [4],
+      "description": "Acknowledgment of received messages.",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 1, "sublabel": 4, "id": "J1.4", "name": "Communication Status",
+      "category": "Network Management", "npgs": [4],
+      "description": "Reports communication system status.",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 1, "sublabel": 5, "id": "J1.5", "name": "Net Control Initialization",
+      "category": "Network Management", "npgs": [4],
+      "description": "Initializes net control parameters.",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 1, "sublabel": 6, "id": "J1.6", "name": "Needline Participation Group Assignment",
+      "category": "Network Management", "npgs": [4],
+      "description": "Assigns participation groups based on needline requirements.",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 2, "sublabel": 0, "id": "J2.0", "name": "Indirect Interface Unit PPLI",
+      "category": "Precise Participant Location and Identification", "npgs": [5, 6, 14, 27],
+      "description": "PPLI for units connected via indirect interface (e.g., forwarded via gateway).",
+      "word_count": null, "packing_mode": "Standard",
+      "fields": [],
+      "confidence": "MEDIUM",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 2, "sublabel": 2, "id": "J2.2", "name": "Air PPLI",
+      "category": "Precise Participant Location and Identification", "npgs": [5, 6, 27],
+      "description": "Precise Participant Location and Identification for air platforms. Contains voice callsign, geodetic position (lat/lon), altitude, course, IFF codes, air platform type, and network participation status. Transmitted nominally every 12 seconds.",
+      "word_count": 3, "packing_mode": "Standard",
+      "fields": [
+        {"name": "Word Format", "bit_offset": 0, "bit_width": 2, "type": "enum", "values": {"0": "Initial"}, "description": "Initial word indicator", "source": "DSTO-TN-1257", "confidence": "HIGH"},
+        {"name": "Label", "bit_offset": 2, "bit_width": 5, "type": "uint", "values": {"2": "PPLI"}, "description": "Message label = 2", "source": "DSTO-TN-1257", "confidence": "HIGH"},
+        {"name": "Sublabel", "bit_offset": 7, "bit_width": 3, "type": "uint", "values": {"2": "Air"}, "description": "Sublabel = 2 (Air)", "source": "DSTO-TN-1257", "confidence": "HIGH"},
+        {"name": "Message Length Indicator", "bit_offset": 10, "bit_width": 3, "type": "uint", "description": "Number of words (typically 2 for 3-word message)", "source": "DSTO-TN-1257", "confidence": "HIGH"},
+        {"name": "Track Number", "bit_offset": null, "bit_width": 15, "type": "octal", "description": "Source Track Number (5-digit octal)", "source": "ADA404334, web sources", "confidence": "MEDIUM"},
+        {"name": "Latitude", "bit_offset": null, "bit_width": 23, "type": "signed_fixed", "description": "Geodetic latitude, WGS-84. Resolution ~0.0039° (~434m)", "source": "Web search inference", "confidence": "LOW"},
+        {"name": "Longitude", "bit_offset": null, "bit_width": 24, "type": "signed_fixed", "description": "Geodetic longitude, WGS-84. Resolution ~0.0039°", "source": "Web search inference", "confidence": "LOW"},
+        {"name": "Altitude", "bit_offset": null, "bit_width": null, "type": "signed_fixed", "description": "Altitude above mean sea level", "source": "Inferred", "confidence": "LOW"},
+        {"name": "Course", "bit_offset": null, "bit_width": null, "type": "uint", "description": "Course/heading of platform", "source": "ADA404334", "confidence": "LOW"},
+        {"name": "Speed", "bit_offset": null, "bit_width": null, "type": "uint", "description": "Platform speed", "source": "ADA404334", "confidence": "LOW"},
+        {"name": "Platform Type", "bit_offset": null, "bit_width": null, "type": "enum", "description": "Air platform type designation", "source": "ADA404334", "confidence": "LOW"},
+        {"name": "IFF/SIF Codes", "bit_offset": null, "bit_width": null, "type": "bitfield", "description": "IFF/SIF transponder codes", "source": "ADA404334", "confidence": "LOW"},
+        {"name": "Voice Callsign", "bit_offset": null, "bit_width": null, "type": "alphanumeric", "description": "Voice callsign of platform", "source": "ADA404334", "confidence": "LOW"}
+      ],
+      "notes": "This is the most commonly observed message type. The 3-word structure (Initial + Extension + Continuation) is confirmed by the SISO-STD-002 Annex B example. Exact bit offsets for payload fields require MIL-STD-6016.",
+      "confidence": "MEDIUM",
+      "source": "DSTO-TN-1257, SISO-STD-002-2021 Annex B, Viasat card, ADA404334"
+    },
+    {
+      "label": 2, "sublabel": 3, "id": "J2.3", "name": "Surface PPLI",
+      "category": "Precise Participant Location and Identification", "npgs": [5, 6, 27],
+      "description": "PPLI for surface (maritime) platforms. Contains position, course, speed, and identification data.",
+      "word_count": 3, "packing_mode": "Standard",
+      "fields": [
+        {"name": "Word Format", "bit_offset": 0, "bit_width": 2, "type": "enum", "description": "Initial word indicator", "confidence": "HIGH"},
+        {"name": "Label", "bit_offset": 2, "bit_width": 5, "type": "uint", "description": "Label = 2", "confidence": "HIGH"},
+        {"name": "Sublabel", "bit_offset": 7, "bit_width": 3, "type": "uint", "description": "Sublabel = 3 (Surface)", "confidence": "HIGH"},
+        {"name": "Message Length Indicator", "bit_offset": 10, "bit_width": 3, "type": "uint", "confidence": "HIGH"},
+        {"name": "Latitude", "bit_offset": null, "bit_width": null, "type": "signed_fixed", "confidence": "LOW"},
+        {"name": "Longitude", "bit_offset": null, "bit_width": null, "type": "signed_fixed", "confidence": "LOW"},
+        {"name": "Course", "bit_offset": null, "bit_width": null, "type": "uint", "confidence": "LOW"},
+        {"name": "Speed", "bit_offset": null, "bit_width": null, "type": "uint", "confidence": "LOW"}
+      ],
+      "confidence": "MEDIUM",
+      "source": "Wireshark dissector (Viasat card), ADA404334"
+    },
+    {
+      "label": 2, "sublabel": 4, "id": "J2.4", "name": "Subsurface PPLI",
+      "category": "Precise Participant Location and Identification", "npgs": [5, 6, 27],
+      "description": "PPLI for subsurface (submarine) platforms.",
+      "word_count": null, "packing_mode": "Standard",
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 2, "sublabel": 5, "id": "J2.5", "name": "Land Point PPLI",
+      "category": "Precise Participant Location and Identification", "npgs": [5, 6, 27],
+      "description": "PPLI for fixed land-based platforms (e.g., command posts, radar sites).",
+      "word_count": null, "packing_mode": "Standard",
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 2, "sublabel": 6, "id": "J2.6", "name": "Land Track PPLI",
+      "category": "Precise Participant Location and Identification", "npgs": [5, 6, 27],
+      "description": "PPLI for mobile land-based platforms (e.g., ground vehicles).",
+      "word_count": null, "packing_mode": "Standard",
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 3, "sublabel": 0, "id": "J3.0", "name": "Reference Point",
+      "category": "Surveillance", "npgs": [7],
+      "description": "Reports a reference point (e.g., datum, waypoint, or fixed geographic reference).",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 3, "sublabel": 1, "id": "J3.1", "name": "Emergency Point",
+      "category": "Surveillance", "npgs": [7],
+      "description": "Reports an emergency point (e.g., downed aircraft, distress signal).",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 3, "sublabel": 2, "id": "J3.2", "name": "Air Track",
+      "category": "Surveillance", "npgs": [7],
+      "description": "Reports an air surveillance track. Contains track number, position (lat/lon/altitude), speed, course, identity (pending/unknown/friend/neutral/suspect/hostile), platform type, specific type, nationality, strength, and track quality.",
+      "word_count": null, "packing_mode": null,
+      "fields": [
+        {"name": "Word Format", "bit_offset": 0, "bit_width": 2, "type": "enum", "confidence": "HIGH"},
+        {"name": "Label", "bit_offset": 2, "bit_width": 5, "type": "uint", "description": "Label = 3", "confidence": "HIGH"},
+        {"name": "Sublabel", "bit_offset": 7, "bit_width": 3, "type": "uint", "description": "Sublabel = 2 (Air Track)", "confidence": "HIGH"},
+        {"name": "Track Number", "bit_offset": null, "bit_width": 15, "type": "octal", "description": "Track number (5-digit octal)", "confidence": "MEDIUM"},
+        {"name": "Identity", "bit_offset": null, "bit_width": null, "type": "enum", "values_partial": ["Pending", "Unknown", "Assumed Friend", "Friend", "Neutral", "Suspect", "Hostile"], "description": "Track identity/IFF status (enumeration INCOMPLETE)", "confidence": "MEDIUM", "source": "ADA404334, Falcon BMS Forum"},
+        {"name": "Latitude", "bit_offset": null, "bit_width": null, "type": "signed_fixed", "description": "Track latitude", "confidence": "LOW"},
+        {"name": "Longitude", "bit_offset": null, "bit_width": null, "type": "signed_fixed", "description": "Track longitude", "confidence": "LOW"},
+        {"name": "Altitude", "bit_offset": null, "bit_width": null, "type": "signed_fixed", "description": "Track altitude", "confidence": "LOW"},
+        {"name": "Speed", "bit_offset": null, "bit_width": null, "type": "uint", "description": "Track speed", "confidence": "LOW"},
+        {"name": "Course", "bit_offset": null, "bit_width": null, "type": "uint", "description": "Track course/heading", "confidence": "LOW"},
+        {"name": "Strength", "bit_offset": null, "bit_width": null, "type": "uint", "description": "Formation strength (defaults to 1 if unspecified)", "confidence": "LOW"},
+        {"name": "Platform Type", "bit_offset": null, "bit_width": null, "type": "enum", "description": "Air platform type (fighter, bomber, etc.)", "confidence": "LOW"},
+        {"name": "Specific Type", "bit_offset": null, "bit_width": null, "type": "enum", "description": "Specific platform designation (F-15, MiG-29, etc.)", "confidence": "LOW"}
+      ],
+      "notes": "Most commonly used surveillance message. Similar fields to ADS-B. Exact bit positions require MIL-STD-6016.",
+      "confidence": "MEDIUM",
+      "source": "Wireshark dissector (Viasat card), ADA404334, ADS-B gateway doc, Falcon BMS"
+    },
+    {
+      "label": 3, "sublabel": 3, "id": "J3.3", "name": "Surface Track",
+      "category": "Surveillance", "npgs": [7],
+      "description": "Reports a surface (maritime) surveillance track. Contains position, course, speed, identity, and vessel type.",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 3, "sublabel": 4, "id": "J3.4", "name": "Subsurface Track",
+      "category": "Surveillance", "npgs": [7],
+      "description": "Reports a subsurface (submarine) surveillance track.",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 3, "sublabel": 5, "id": "J3.5", "name": "Land Point or Track",
+      "category": "Surveillance", "npgs": [7],
+      "description": "Reports a land point or land mobile track.",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 3, "sublabel": 6, "id": "J3.6", "name": "Space Track",
+      "category": "Surveillance", "npgs": [7],
+      "description": "Reports a space surveillance track (satellite, missile, etc.).",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 3, "sublabel": 7, "id": "J3.7", "name": "Electronic Warfare Product Information",
+      "category": "Surveillance", "npgs": [7, 10],
+      "description": "Reports electronic warfare product information associated with surveillance tracks.",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 5, "sublabel": 4, "id": "J5.4", "name": "Acoustic Bearing and Range",
+      "category": "Anti-Submarine Warfare", "npgs": [7],
+      "description": "Reports acoustic bearing and range data for ASW operations.",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 6, "sublabel": 0, "id": "J6.0", "name": "Amplification",
+      "category": "Intelligence", "npgs": [7],
+      "description": "Provides amplifying intelligence information for tracks or events.",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {
+      "label": 7, "sublabel": 0, "id": "J7.0", "name": "Track Management",
+      "category": "Information Management", "npgs": [7],
+      "description": "Manages track data including track drops, updates, and transfers.",
+      "word_count": null, "packing_mode": null,
+      "fields": [],
+      "confidence": "STUB",
+      "source": "Wireshark dissector (Viasat card)"
+    },
+    {"label": 7, "sublabel": 1, "id": "J7.1", "name": "Data Update Request", "category": "Information Management", "npgs": [7], "description": "Requests updated data for specified tracks.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 7, "sublabel": 2, "id": "J7.2", "name": "Correlation", "category": "Information Management", "npgs": [7], "description": "Correlates tracks from multiple sources to establish unified track picture.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 7, "sublabel": 3, "id": "J7.3", "name": "Pointer", "category": "Information Management", "npgs": [7], "description": "Points to related tracks or data.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 7, "sublabel": 4, "id": "J7.4", "name": "Track Identifier", "category": "Information Management", "npgs": [7], "description": "Provides track identification data.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 7, "sublabel": 5, "id": "J7.5", "name": "IFF/SIF Management", "category": "Information Management", "npgs": [7], "description": "Manages IFF/SIF transponder code assignments.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 7, "sublabel": 6, "id": "J7.6", "name": "Filter Management", "category": "Information Management", "npgs": [7], "description": "Manages data filtering criteria for track distribution.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 7, "sublabel": 7, "id": "J7.7", "name": "Association", "category": "Information Management", "npgs": [7], "description": "Associates related tracks or entities.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 8, "sublabel": 0, "id": "J8.0", "name": "Unit Designator", "category": "Information Management", "npgs": [8], "description": "Designates a unit for mission assignment or tasking.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 8, "sublabel": 1, "id": "J8.1", "name": "Mission Correlator Change", "category": "Information Management", "npgs": [8], "description": "Changes mission correlator assignments.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 9, "sublabel": 0, "id": "J9.0", "name": "Command", "category": "Weapons Coordination and Management", "npgs": [8], "description": "Issues commands for weapons engagement and management.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 10, "sublabel": 2, "id": "J10.2", "name": "Engagement Status", "category": "Weapons Coordination and Management", "npgs": [8, 21], "description": "Reports engagement status between weapons platforms and targets.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 10, "sublabel": 3, "id": "J10.3", "name": "Handover", "category": "Weapons Coordination and Management", "npgs": [8, 21], "description": "Transfers engagement responsibility from one platform to another.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 10, "sublabel": 5, "id": "J10.5", "name": "Controlling Unit Report", "category": "Weapons Coordination and Management", "npgs": [8, 21], "description": "Reports from the controlling unit on engagement status.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 10, "sublabel": 6, "id": "J10.6", "name": "Pairing", "category": "Weapons Coordination and Management", "npgs": [8, 21], "description": "Pairs weapons platforms with targets for engagement.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 11, "sublabel": 0, "id": "J11.0", "name": "From the Weapon", "category": "Weapons Coordination and Management", "npgs": [8, 18], "description": "Status reports from a weapon in flight to the controlling platform.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 11, "sublabel": 1, "id": "J11.1", "name": "To the Weapon", "category": "Weapons Coordination and Management", "npgs": [8, 18], "description": "Commands and updates sent to a weapon in flight.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 11, "sublabel": 2, "id": "J11.2", "name": "Weapon Coordination", "category": "Weapons Coordination and Management", "npgs": [8, 18], "description": "Coordinates weapons employment between platforms.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 12, "sublabel": 0, "id": "J12.0", "name": "Mission Assignment", "category": "Control", "npgs": [8, 9], "description": "Assigns missions (engagement, reconnaissance, etc.) to controlled units.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card), Grokipedia"},
+    {"label": 12, "sublabel": 1, "id": "J12.1", "name": "Vector", "category": "Control", "npgs": [8, 9], "description": "Provides steering vectors to controlled aircraft.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 12, "sublabel": 2, "id": "J12.2", "name": "Precision Aircraft Direction", "category": "Control", "npgs": [8, 9], "description": "Provides precise aircraft direction for intercept.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 12, "sublabel": 3, "id": "J12.3", "name": "Flight Path", "category": "Control", "npgs": [8, 9], "description": "Defines a flight path for controlled aircraft.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 12, "sublabel": 4, "id": "J12.4", "name": "Controlling Unit Change", "category": "Control", "npgs": [8, 9], "description": "Transfers control of a unit from one controller to another.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 12, "sublabel": 5, "id": "J12.5", "name": "Target/Track Correlation", "category": "Control", "npgs": [8, 9], "description": "Correlates targets and tracks for engagement.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 12, "sublabel": 6, "id": "J12.6", "name": "Target Sorting", "category": "Control", "npgs": [8, 9], "description": "Sorts and prioritizes targets for engagement.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 12, "sublabel": 7, "id": "J12.7", "name": "Target Bearing", "category": "Control", "npgs": [8, 9], "description": "Reports target bearing data.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 13, "sublabel": 0, "id": "J13.0", "name": "Airfield Status", "category": "Platform and System Status", "npgs": [7, 8], "description": "Reports airfield operational status.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 13, "sublabel": 2, "id": "J13.2", "name": "Air Platform and System Status", "category": "Platform and System Status", "npgs": [7, 8], "description": "Reports detailed platform and weapons system status for air platforms.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 13, "sublabel": 3, "id": "J13.3", "name": "Surface Platform and System Status", "category": "Platform and System Status", "npgs": [7, 8], "description": "Reports detailed platform and weapons system status for surface platforms.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 13, "sublabel": 4, "id": "J13.4", "name": "Subsurface Platform and System Status", "category": "Platform and System Status", "npgs": [7, 8], "description": "Reports platform and weapons system status for subsurface platforms.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 13, "sublabel": 5, "id": "J13.5", "name": "Land Platform and System Status", "category": "Platform and System Status", "npgs": [7, 8], "description": "Reports platform and weapons system status for land platforms.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 14, "sublabel": 0, "id": "J14.0", "name": "Parametric Information", "category": "Electronic Warfare", "npgs": [10], "description": "Reports electronic warfare parametric data (emitter characteristics, signal parameters).", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 14, "sublabel": 2, "id": "J14.2", "name": "Electronic Warfare Control / Coordination", "category": "Electronic Warfare", "npgs": [10], "description": "Coordinates electronic warfare operations and countermeasures.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 15, "sublabel": 0, "id": "J15.0", "name": "Threat Warning", "category": "Threat Warning", "npgs": [7, 8], "description": "Issues threat warnings for incoming threats.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 16, "sublabel": 0, "id": "J16.0", "name": "Imagery", "category": "Imagery", "npgs": [11], "description": "Transfers imagery data.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 17, "sublabel": 0, "id": "J17.0", "name": "Weather Over Target", "category": "Weather", "npgs": [7], "description": "Reports weather conditions over a target area.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 28, "sublabel": 0, "id": "J28.0", "name": "U.S. National 1 (Army)", "category": "National Use", "npgs": [], "description": "U.S. Army national use message.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 28, "sublabel": 1, "id": "J28.1", "name": "U.S. National 2 (Navy)", "category": "National Use", "npgs": [], "description": "U.S. Navy national use message.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 28, "sublabel": 2, "id": "J28.2", "name": "U.S. National 3 (Air Force)", "category": "National Use", "npgs": [], "description": "U.S. Air Force national use message. Also used for free text messaging.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "MEDIUM", "source": "Wireshark dissector (Viasat card), SISO-STD-002-2021"},
+    {"label": 28, "sublabel": 3, "id": "J28.3", "name": "U.S. National 4 (Marine Corps)", "category": "National Use", "npgs": [], "description": "U.S. Marine Corps national use message.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 28, "sublabel": 4, "id": "J28.4", "name": "French National 1", "category": "National Use", "npgs": [], "description": "French national use message 1.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 28, "sublabel": 5, "id": "J28.5", "name": "French National 2", "category": "National Use", "npgs": [], "description": "French national use message 2.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 28, "sublabel": 6, "id": "J28.6", "name": "U.S. National 5 (NSA)", "category": "National Use", "npgs": [], "description": "NSA national use message.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 28, "sublabel": 7, "id": "J28.7", "name": "UK National", "category": "National Use", "npgs": [], "description": "United Kingdom national use message.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 31, "sublabel": 0, "id": "J31.0", "name": "Over-the-Air Rekeying Management", "category": "Miscellaneous", "npgs": [], "description": "Manages over-the-air cryptographic rekeying operations.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {"label": 31, "sublabel": 1, "id": "J31.1", "name": "Over-the-Air Rekeying", "category": "Miscellaneous", "npgs": [], "description": "Performs the actual over-the-air rekeying of cryptographic variables.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
+    {
+      "label": 31, "sublabel": 7, "id": "J31.7", "name": "No Statement",
+      "category": "Miscellaneous", "npgs": [],
+      "description": "A 1-word message used to pad time slots to 3, 6, or 12 words. Contains no tactical information.",
+      "word_count": 1, "packing_mode": null,
+      "fields": [
+        {"name": "Word Format", "bit_offset": 0, "bit_width": 2, "type": "enum", "values": {"0": "Initial"}, "confidence": "HIGH"},
+        {"name": "Label", "bit_offset": 2, "bit_width": 5, "type": "uint", "values": {"31": "Miscellaneous"}, "confidence": "HIGH"},
+        {"name": "Sublabel", "bit_offset": 7, "bit_width": 3, "type": "uint", "values": {"7": "No Statement"}, "confidence": "HIGH"},
+        {"name": "MLI", "bit_offset": 10, "bit_width": 3, "type": "uint", "values": {"0": "1 word"}, "confidence": "HIGH"},
+        {"name": "Padding", "bit_offset": 13, "bit_width": 57, "type": "padding", "description": "Set to all zeros or ignored", "confidence": "MEDIUM"}
+      ],
+      "confidence": "HIGH",
+      "source": "SISO-STD-002-2021 §4.1.1, Wireshark dissector (Viasat card)"
+    }
+  ],
+  "terminal_types": [
+    {"name": "JTIDS Class 1", "weight_lbs": 250, "platform": "Large aircraft (E-3 AWACS)", "confidence": "MEDIUM", "source": "Grokipedia"},
+    {"name": "JTIDS Class 2", "weight_lbs": 128, "platform": "Ground/mobile", "confidence": "MEDIUM", "source": "Grokipedia"},
+    {"name": "MIDS LVT(1)", "weight_lbs": 42.5, "platform": "Fighter aircraft", "confidence": "MEDIUM", "source": "Grokipedia"},
+    {"name": "MIDS LVT(2) / AN/USQ-140(V)", "weight_lbs": null, "platform": "Command posts", "confidence": "MEDIUM", "source": "Grokipedia"},
+    {"name": "MIDS JTRS", "weight_lbs": 50.6, "platform": "Multi-waveform capable", "confidence": "MEDIUM", "source": "Grokipedia"}
+  ],
+  "statistics": {
+    "total_label_sublabel_identifiers": 256,
+    "known_message_types": 69,
+    "confidence_breakdown": {
+      "HIGH": 3,
+      "MEDIUM": 5,
+      "LOW": 0,
+      "STUB": 61
+    },
+    "label_coverage": {
+      "well_covered": [0, 1, 2, 3, 31],
+      "partially_covered": [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 28],
+      "no_coverage": [4, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 29, 30]
+    }
+  }
+}
