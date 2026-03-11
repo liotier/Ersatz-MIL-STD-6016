@@ -85,7 +85,7 @@
     "transmit_power_watts": 200,
     "range_nm": 300,
     "confidence": "HIGH",
-    "source": "SISO-STD-002-2021 Table 1, Grokipedia"
+    "source": "SISO-STD-002-2021 Table 1"
   },
   "tdma_structure": {
     "time_slot": {
@@ -99,7 +99,7 @@
       "duration_s": 12,
       "slots_per_frame": 1536,
       "confidence": "HIGH",
-      "source": "Grokipedia, AFIT Thesis"
+      "source": "AFIT Thesis"
     },
     "epoch": {
       "duration_minutes": 12.8,
@@ -226,7 +226,7 @@
         "pulse_type": "double",
         "description": "Same word count as P4-SP but uses double-pulse encoding for improved jam resistance",
         "confidence": "MEDIUM",
-        "source": "Wikipedia, Grokipedia"
+        "source": "Wikipedia"
       }
     ],
     "max_throughput": {
@@ -667,7 +667,7 @@
     {"label": 11, "sublabel": 0, "id": "J11.0", "name": "From the Weapon", "category": "Weapons Coordination and Management", "npgs": [8, 18], "description": "Status reports from a weapon in flight to the controlling platform.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
     {"label": 11, "sublabel": 1, "id": "J11.1", "name": "To the Weapon", "category": "Weapons Coordination and Management", "npgs": [8, 18], "description": "Commands and updates sent to a weapon in flight.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
     {"label": 11, "sublabel": 2, "id": "J11.2", "name": "Weapon Coordination", "category": "Weapons Coordination and Management", "npgs": [8, 18], "description": "Coordinates weapons employment between platforms.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
-    {"label": 12, "sublabel": 0, "id": "J12.0", "name": "Mission Assignment", "category": "Control", "npgs": [8, 9], "description": "Assigns missions (engagement, reconnaissance, etc.) to controlled units.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card), Grokipedia"},
+    {"label": 12, "sublabel": 0, "id": "J12.0", "name": "Mission Assignment", "category": "Control", "npgs": [8, 9], "description": "Assigns missions (engagement, reconnaissance, etc.) to controlled units.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
     {"label": 12, "sublabel": 1, "id": "J12.1", "name": "Vector", "category": "Control", "npgs": [8, 9], "description": "Provides steering vectors to controlled aircraft.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
     {"label": 12, "sublabel": 2, "id": "J12.2", "name": "Precision Aircraft Direction", "category": "Control", "npgs": [8, 9], "description": "Provides precise aircraft direction for intercept.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
     {"label": 12, "sublabel": 3, "id": "J12.3", "name": "Flight Path", "category": "Control", "npgs": [8, 9], "description": "Defines a flight path for controlled aircraft.", "word_count": null, "packing_mode": null, "fields": [], "confidence": "STUB", "source": "Wireshark dissector (Viasat card)"},
@@ -712,11 +712,11 @@
     }
   ],
   "terminal_types": [
-    {"name": "JTIDS Class 1", "weight_lbs": 250, "platform": "Large aircraft (E-3 AWACS)", "confidence": "MEDIUM", "source": "Grokipedia"},
-    {"name": "JTIDS Class 2", "weight_lbs": 128, "platform": "Ground/mobile", "confidence": "MEDIUM", "source": "Grokipedia"},
-    {"name": "MIDS LVT(1)", "weight_lbs": 42.5, "platform": "Fighter aircraft", "confidence": "MEDIUM", "source": "Grokipedia"},
-    {"name": "MIDS LVT(2) / AN/USQ-140(V)", "weight_lbs": null, "platform": "Command posts", "confidence": "MEDIUM", "source": "Grokipedia"},
-    {"name": "MIDS JTRS", "weight_lbs": 50.6, "platform": "Multi-waveform capable", "confidence": "MEDIUM", "source": "Grokipedia"}
+    {"name": "JTIDS Class 1", "weight_lbs": 250, "platform": "Large aircraft (E-3 AWACS)", "confidence": "MEDIUM", "source": "Wikipedia"},
+    {"name": "JTIDS Class 2", "weight_lbs": 128, "platform": "Ground/mobile", "confidence": "MEDIUM", "source": "Wikipedia"},
+    {"name": "MIDS LVT(1)", "weight_lbs": 42.5, "platform": "Fighter aircraft", "confidence": "MEDIUM", "source": "Wikipedia"},
+    {"name": "MIDS LVT(2) / AN/USQ-140(V)", "weight_lbs": null, "platform": "Command posts", "confidence": "MEDIUM", "source": "Wikipedia"},
+    {"name": "MIDS JTRS", "weight_lbs": 50.6, "platform": "Multi-waveform capable", "confidence": "MEDIUM", "source": "Wikipedia"}
   ],
   "statistics": {
     "total_label_sublabel_identifiers": 256,
