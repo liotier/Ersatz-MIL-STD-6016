@@ -8,7 +8,7 @@ Open-source reconstruction of the Link 16 / TADIL-J message schema, built entire
 
 The interactive HTML reference is published via GitHub Pages:
 
-**https://liotier.github.io/Ersatz-MIL-STD-6016/link16-reference.html**
+**https://liotier.github.io/Ersatz-MIL-STD-6016/**
 
 ## Contents
 
